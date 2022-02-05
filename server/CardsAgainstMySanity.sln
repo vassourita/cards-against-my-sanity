@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{08F791BA-9BAB-469F-A72E-D65017C19F00}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardsAgainstMySanity.Domain", "src\CardsAgainstMySanity.Domain\CardsAgainstMySanity.Domain.csproj", "{91B7942D-EF5C-461B-8155-256570C379D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardsAgainstMySanity.Infrastructure", "src\CardsAgainstMySanity.Infrastructure\CardsAgainstMySanity.Infrastructure.csproj", "{D85F883F-C5A7-455B-AA77-1BA712EB541A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardsAgainstMySanity.Infrastructure.Data", "src\CardsAgainstMySanity.Infrastructure.Data\CardsAgainstMySanity.Infrastructure.Data.csproj", "{E13E1CA6-BBC4-4765-AB12-4BFDE726FD30}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardsAgainstMySanity.Infrastructure.IoC", "src\CardsAgainstMySanity.Infrastructure.IoC\CardsAgainstMySanity.Infrastructure.IoC.csproj", "{648312A3-F5F2-47D8-A59B-12A7A74CCDB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardsAgainstMySanity.Presentation", "src\CardsAgainstMySanity.Presentation\CardsAgainstMySanity.Presentation.csproj", "{E6A5D117-5E66-41F7-8C05-3320D1101665}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardsAgainstMySanity.SharedKernel", "src\CardsAgainstMySanity.SharedKernel\CardsAgainstMySanity.SharedKernel.csproj", "{5B0B6F6F-0C14-4F7C-BDDB-E17756E9BF21}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{91B7942D-EF5C-461B-8155-256570C379D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91B7942D-EF5C-461B-8155-256570C379D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91B7942D-EF5C-461B-8155-256570C379D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91B7942D-EF5C-461B-8155-256570C379D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D85F883F-C5A7-455B-AA77-1BA712EB541A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D85F883F-C5A7-455B-AA77-1BA712EB541A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D85F883F-C5A7-455B-AA77-1BA712EB541A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D85F883F-C5A7-455B-AA77-1BA712EB541A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E13E1CA6-BBC4-4765-AB12-4BFDE726FD30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E13E1CA6-BBC4-4765-AB12-4BFDE726FD30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E13E1CA6-BBC4-4765-AB12-4BFDE726FD30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E13E1CA6-BBC4-4765-AB12-4BFDE726FD30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{648312A3-F5F2-47D8-A59B-12A7A74CCDB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{648312A3-F5F2-47D8-A59B-12A7A74CCDB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{648312A3-F5F2-47D8-A59B-12A7A74CCDB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{648312A3-F5F2-47D8-A59B-12A7A74CCDB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6A5D117-5E66-41F7-8C05-3320D1101665}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6A5D117-5E66-41F7-8C05-3320D1101665}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6A5D117-5E66-41F7-8C05-3320D1101665}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6A5D117-5E66-41F7-8C05-3320D1101665}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B0B6F6F-0C14-4F7C-BDDB-E17756E9BF21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B0B6F6F-0C14-4F7C-BDDB-E17756E9BF21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B0B6F6F-0C14-4F7C-BDDB-E17756E9BF21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B0B6F6F-0C14-4F7C-BDDB-E17756E9BF21}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{91B7942D-EF5C-461B-8155-256570C379D1} = {08F791BA-9BAB-469F-A72E-D65017C19F00}
+		{D85F883F-C5A7-455B-AA77-1BA712EB541A} = {08F791BA-9BAB-469F-A72E-D65017C19F00}
+		{E13E1CA6-BBC4-4765-AB12-4BFDE726FD30} = {08F791BA-9BAB-469F-A72E-D65017C19F00}
+		{648312A3-F5F2-47D8-A59B-12A7A74CCDB1} = {08F791BA-9BAB-469F-A72E-D65017C19F00}
+		{E6A5D117-5E66-41F7-8C05-3320D1101665} = {08F791BA-9BAB-469F-A72E-D65017C19F00}
+		{5B0B6F6F-0C14-4F7C-BDDB-E17756E9BF21} = {08F791BA-9BAB-469F-A72E-D65017C19F00}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\CardsAgainstMySanity.Domain\CardsAgainstMySanity.Domain.csproj" />
+    <ProjectReference Include="..\CardsAgainstMySanity.SharedKernel\CardsAgainstMySanity.SharedKernel.csproj" />
+    <ProjectReference Include="..\CardsAgainstMySanity.Infrastructure.Data\CardsAgainstMySanity.Infrastructure.Data.csproj" />
+    <ProjectReference Include="..\CardsAgainstMySanity.Infrastructure\CardsAgainstMySanity.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
