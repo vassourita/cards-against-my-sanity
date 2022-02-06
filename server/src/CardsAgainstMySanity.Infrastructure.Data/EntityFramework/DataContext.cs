@@ -10,6 +10,12 @@ namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework
         {
         }
 
+        override protected void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+            optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+        }
+
         public DbSet<Guest> Guests { get; set; }
 
         override protected void OnModelCreating(ModelBuilder modelBuilder)

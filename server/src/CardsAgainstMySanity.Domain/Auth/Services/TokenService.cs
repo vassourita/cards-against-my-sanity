@@ -53,7 +53,7 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             {
                 return null;
             }
-            var user = await _guestRepository.FindByIdAsync(refreshToken.Token);
+            var user = await _guestRepository.FindByIdAsync(refreshToken.UserId);
             if (user == null)
             {
                 return null;

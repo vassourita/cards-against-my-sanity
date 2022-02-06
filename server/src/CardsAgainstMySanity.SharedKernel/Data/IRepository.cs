@@ -1,6 +1,6 @@
 namespace CardsAgainstMySanity.SharedKernel.Data
 {
-    public interface IRepository<T, TId> : IUnitOfWork
+    public interface IRepository<T, TId> : IUnitOfWork, IDisposable
     {
         Task<T> FindByIdAsync(TId id);
         Task<T> AddAsync(T entity);
