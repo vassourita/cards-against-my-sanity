@@ -18,6 +18,8 @@ namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework
 
             modelBuilder.Entity<Guest>(builder =>
             {
+                builder.ToTable("guest");
+
                 builder.HasKey(guest => guest.Id);
 
                 builder.Property(guest => guest.Id)
@@ -54,6 +56,8 @@ namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework
 
             modelBuilder.Entity<RefreshToken>(builder =>
             {
+                builder.ToTable("refresh_token");
+
                 builder.HasKey(token => token.Token);
 
                 builder.Property(guest => guest.Token)
