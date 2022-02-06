@@ -5,7 +5,7 @@ namespace CardsAgainstMySanity.Domain.Auth
 {
     public class User
     {
-        public Guid Id { get; private set; }
+        public Guid Id { get; protected set; }
         public string Username { get; protected set; }
         public string IpAddress { get; protected set; }
         public string AccessToken { get; protected set; }
@@ -13,6 +13,12 @@ namespace CardsAgainstMySanity.Domain.Auth
         public DateTime LastPong { get; protected set; }
 
         public ICollection<RefreshToken> RefreshTokens { get; protected set; }
+
+        // For EF
+        protected User()
+        {
+            RefreshTokens = new Collection<RefreshToken>();
+        }
 
         public User(string username, string ipAddress)
         {
