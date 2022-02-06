@@ -2,7 +2,7 @@ using CardsAgainstMySanity.Domain.Auth;
 using CardsAgainstMySanity.Domain.Auth.Tokens;
 using Microsoft.EntityFrameworkCore;
 
-namespace CardsAgainstMySanity.Infrastructure.Data
+namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework
 {
     public class DataContext : DbContext
     {
