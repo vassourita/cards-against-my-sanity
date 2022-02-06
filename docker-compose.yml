@@ -1,0 +1,15 @@
+version: "3.7"
+
+services:
+  cards-db:
+    container_name: cards-db
+    image: postgres:13
+    ports:
+      - 5001:5432
+    environment:
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=cards_db
+    volumes:
+      - /var/lib/postgresql/data
+    restart: always
