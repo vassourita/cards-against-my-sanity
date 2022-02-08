@@ -18,7 +18,7 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             _guestRepository = guestRepository;
         }
 
-        public string GenerateAccessToken(User user)
+        public string GenerateAccessToken(IUser user)
         {
             var now = DateTime.UtcNow;
             var claims = new[]

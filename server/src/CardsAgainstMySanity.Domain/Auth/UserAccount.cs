@@ -3,15 +3,15 @@ using CardsAgainstMySanity.Domain.Auth.Tokens;
 
 namespace CardsAgainstMySanity.Domain.Auth
 {
-    public class Guest : IUser
+    public class UserAccount : IUser
     {
         // For EF
-        protected Guest()
+        protected UserAccount()
         {
             RefreshTokens = new Collection<RefreshToken>();
         }
 
-        public Guest(string username, string ipAddress)
+        public UserAccount(string username, string ipAddress)
         {
             Id = Guid.NewGuid();
             Username = username;
@@ -23,10 +23,14 @@ namespace CardsAgainstMySanity.Domain.Auth
         public Guid Id { get; protected set; }
         public string AvatarUrl { get; protected set; }
         public string Username { get; protected set; }
+        public string Email { get; protected set; }
+        public string PasswordHash { get; protected set; }
         public string IpAddress { get; protected set; }
         public string AccessToken { get; protected set; }
         public DateTime CreatedAt { get; protected set; }
+        public DateTime UpdatedAt { get; protected set; }
         public DateTime LastPong { get; protected set; }
+
         public ICollection<RefreshToken> RefreshTokens { get; protected set; }
 
         public void SetAccessToken(string accessToken, string ipAddress)

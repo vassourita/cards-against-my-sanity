@@ -2,7 +2,7 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
 {
     public class AccessService
     {
-        void CanUserAccess(User user)
+        void CanUserAccess(IUser user)
         {
             // ** - Um pong acontece a cada 10s
 
