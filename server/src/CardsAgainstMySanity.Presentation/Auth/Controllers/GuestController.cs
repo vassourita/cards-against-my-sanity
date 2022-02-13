@@ -24,28 +24,30 @@ namespace CardsAgainstMySanity.Presentation.Auth.Controllers
             {
                 dto.IpAddress = HttpContext.Connection.RemoteIpAddress.ToString();
                 var result = await _guestService.InitSession(dto);
-                if (result.Succeeded)
+
+                if (result.Failed)
                 {
-                    var guest = result.Data;
-                    Response.Cookies.Append("cards_accesstoken", guest.AccessToken, new CookieOptions
-                    {
-                        HttpOnly = true,
-                        SameSite = SameSiteMode.Strict
-                    });
-                    var refreshToken = guest.RefreshTokens.OrderBy(t => t.CreatedAt).Last().Token.ToString();
-                    Response.Cookies.Append("cards_refreshtoken", refreshToken, new CookieOptions
-                    {
-                        HttpOnly = true,
-                        SameSite = SameSiteMode.Strict
-                    });
-                    return Ok(result.Data);
+                    return BadRequest("Failed to init session");
                 }
-                return BadRequest("Failed to init session");
+
+                var guest = result.Data;
+                Response.Cookies.Append("cards_accesstoken", guest.AccessToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Strict
+                });
+                var refreshToken = guest.RefreshTokens.OrderBy(t => t.CreatedAt).Last().Token.ToString();
+                Response.Cookies.Append("cards_refreshtoken", refreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Strict
+                });
+                return Ok(GuestLoginViewModel.FromGuest(guest));
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
-                return StatusCode(500, new { Message = e.Message });
+                return StatusCode(500);
             }
         }
     }
