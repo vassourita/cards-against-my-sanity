@@ -20,10 +20,15 @@ namespace CardsAgainstMySanity.Presentation.Auth.Controllers
         [HttpPost]
         public async Task<IActionResult> InitSession(GuestInitSessionDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState.SelectMany(x => x.Value.Errors).Select(x => x.ErrorMessage));
+            }
+
             try
             {
-                dto.IpAddress = HttpContext.Connection.RemoteIpAddress.ToString();
-                var result = await _guestService.InitSession(dto);
+                var ipAddress = HttpContext.Connection.RemoteIpAddress.ToString();
+                var result = await _guestService.InitSession(dto, ipAddress);
 
                 if (result.Failed)
                 {
