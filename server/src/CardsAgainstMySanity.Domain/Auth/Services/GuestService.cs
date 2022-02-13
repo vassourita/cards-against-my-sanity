@@ -22,7 +22,7 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
 
             var accessToken = _tokenService.GenerateAccessToken(guest);
             guest.SetAccessToken(accessToken, guestInitSessionDto.IpAddress);
-            var refreshToken = _tokenService.GenerateRefreshToken();
+            var refreshToken = _tokenService.GenerateRefreshToken(true);
             guest.AddRefreshToken(refreshToken);
 
             await _guestRepository.AddAsync(guest);

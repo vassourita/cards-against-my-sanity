@@ -40,10 +40,13 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public RefreshToken GenerateRefreshToken()
+        public RefreshToken GenerateRefreshToken(bool isGuest)
         {
+            var expiration = DateTime.UtcNow.AddMinutes(
+                isGuest ? _tokenSettings.GuestRefreshTokenExpirationInMinutes : _tokenSettings.UserAccountRefreshTokenExpirationInMinutes
+            );
             var now = DateTime.UtcNow;
-            var refreshToken = new RefreshToken(Guid.NewGuid().ToString(), now.AddMinutes(_tokenSettings.GuestRefreshTokenExpirationInMinutes));
+            var refreshToken = new RefreshToken(Guid.NewGuid().ToString(), expiration);
             return refreshToken;
         }
 
