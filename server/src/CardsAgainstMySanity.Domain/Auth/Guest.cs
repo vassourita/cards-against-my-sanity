@@ -11,11 +11,12 @@ namespace CardsAgainstMySanity.Domain.Auth
             RefreshTokens = new Collection<RefreshToken>();
         }
 
-        public Guest(string username, string ipAddress)
+        public Guest(string username, string ipAddress, string avatarUrl)
         {
             Id = Guid.NewGuid();
             Username = username;
             IpAddress = ipAddress;
+            AvatarUrl = avatarUrl;
             CreatedAt = DateTime.UtcNow;
             RefreshTokens = new Collection<RefreshToken>();
         }

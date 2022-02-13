@@ -18,9 +18,10 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
 
         public async Task<Result<Guest>> InitSession(GuestInitSessionDto guestInitSessionDto)
         {
-            var guest = new Guest(guestInitSessionDto.Username, guestInitSessionDto.IpAddress);
+            var guest = new Guest(guestInitSessionDto.Username, guestInitSessionDto.IpAddress, "");
 
             var accessToken = _tokenService.GenerateAccessToken(guest);
+            guest.SetAccessToken(accessToken, guestInitSessionDto.IpAddress);
             var refreshToken = _tokenService.GenerateRefreshToken();
             guest.AddRefreshToken(refreshToken);
 

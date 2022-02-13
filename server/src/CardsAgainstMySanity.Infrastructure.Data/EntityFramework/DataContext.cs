@@ -31,6 +31,11 @@ namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework
                 builder.Property(guest => guest.Id)
                     .HasColumnName("id");
 
+                builder.Property(guest => guest.AvatarUrl)
+                    .HasColumnName("avatar_url")
+                    .HasMaxLength(255)
+                    .IsRequired();
+
                 builder.Property(guest => guest.Username)
                     .HasColumnName("username")
                     .HasMaxLength(24)

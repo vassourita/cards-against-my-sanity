@@ -14,7 +14,12 @@ namespace CardsAgainstMySanity.Infrastructure.IoC
         public static IServiceCollection AddCardsAgainstMySanity(this IServiceCollection services, IConfiguration configuration)
         {
             // Configuration
-            services.Configure<TokenSettings>(configuration.GetSection("TokenSettings"));
+            services.AddSingleton<TokenSettings>((_) =>
+            {
+                var tokenSettings = new TokenSettings();
+                configuration.Bind("TokenSettings", tokenSettings);
+                return tokenSettings;
+            });
 
             // EF
             services.AddDbContext<DataContext>(options =>

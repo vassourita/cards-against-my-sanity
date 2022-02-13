@@ -7,9 +7,6 @@ namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Repositories
 
     public class EFGuestRepository : GenericRepository<Guest, Guid>, IGuestRepository
     {
-        private new readonly DataContext _dbContext;
-        private readonly DbSet<Guest> _guests;
-
         public EFGuestRepository(DataContext dbContext) : base(dbContext)
         {
         }
