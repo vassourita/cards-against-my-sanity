@@ -30,5 +30,10 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
 
             return Result<Guest>.Ok(guest);
         }
+
+        public async Task<Guest> GetGuestById(Guid id)
+        {
+            return await _guestRepository.FindByIdAsync(id);
+        }
     }
 }
