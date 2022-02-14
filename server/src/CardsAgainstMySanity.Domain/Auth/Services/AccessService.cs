@@ -1,55 +1,41 @@
 using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 using CardsAgainstMySanity.Domain.Auth.Repositories;
-using CardsAgainstMySanity.Domain.Auth.Tokens;
-using Microsoft.IdentityModel.Tokens;
+using CardsAgainstMySanity.SharedKernel;
 
 namespace CardsAgainstMySanity.Domain.Auth.Services
 {
+    public enum AccessValidationError
+    {
+        AccessTokenInvalid,
+        RefreshTokenInvalid,
+    }
+
     public class AccessService
     {
-        private readonly IGuestRepository _guestRepository;
-        private readonly TokenSettings _tokenSettings;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
 
-        public AccessService(IGuestRepository guestRepository, TokenSettings tokenSettings)
+        private readonly TokenService _tokenService;
+
+        public AccessService(IRefreshTokenRepository refreshTokenRepository, TokenService tokenService)
         {
-            _guestRepository = guestRepository;
-            _tokenSettings = tokenSettings;
+            _refreshTokenRepository = refreshTokenRepository;
+            _tokenService = tokenService;
         }
 
-        public bool IsAccessTokenValid(string accessToken, out ClaimsPrincipal principal)
+        public Task<Result<(ClaimsPrincipal, string), AccessValidationError>> ValidateUserTokens(string accessToken, string refreshTokenId)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            TokenValidationParameters validationParameters = new()
+            if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshTokenId))
             {
-                ValidateAudience = true,
-                ValidAudience = _tokenSettings.AccessTokenAudience,
-                ValidateIssuer = true,
-                ValidIssuer = _tokenSettings.AccessTokenIssuer,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenSettings.SecretKey)),
-                ValidateLifetime = true,
-            };
-
-            SecurityToken validatedToken;
-            principal = tokenHandler.ValidateToken(accessToken, validationParameters, out validatedToken);
-            if (principal == null)
-            {
-                return false;
+                return Task.FromResult(Result<(ClaimsPrincipal, string), AccessValidationError>.Fail(AccessValidationError.AccessTokenInvalid));
             }
-            return true;
+
+            if (_tokenService.IsAccessTokenValid(accessToken, out var principal))
+            {
+                return Task.FromResult(Result<(ClaimsPrincipal, string), AccessValidationError>.Ok((principal, accessToken)));
+            }
+            return Task.FromResult(Result<(ClaimsPrincipal, string), AccessValidationError>.Fail(AccessValidationError.RefreshTokenInvalid));
         }
 
-        public bool IsRefreshTokenValid(string refreshToken)
-        {
-            return true;
-        }
-
-        public string RefreshAccessToken(string refreshToken)
-        {
-            return "";
-        }
         public bool IsUserAFK(string accessToken)
         {
             return true;

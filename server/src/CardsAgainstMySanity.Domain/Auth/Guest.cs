@@ -28,6 +28,7 @@ namespace CardsAgainstMySanity.Domain.Auth
         public string AccessToken { get; protected set; }
         public DateTime CreatedAt { get; protected set; }
         public DateTime LastPong { get; protected set; }
+
         public ICollection<RefreshToken> RefreshTokens { get; protected set; }
 
         public void SetAccessToken(string accessToken, string ipAddress)

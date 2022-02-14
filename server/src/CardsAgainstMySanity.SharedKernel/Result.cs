@@ -28,7 +28,6 @@ namespace CardsAgainstMySanity.SharedKernel
     }
 
     public class Result<TData> : Result
-        where TData : class
     {
         public TData Data { get; }
 
@@ -44,13 +43,11 @@ namespace CardsAgainstMySanity.SharedKernel
 
         public static new Result<TData> Fail()
         {
-            return new Result<TData>(false, null);
+            return new Result<TData>(false, default(TData));
         }
     }
 
     public class Result<TData, TError> : Result<TData>
-        where TData : class
-        where TError : class
     {
         public TError Error { get; }
 
@@ -61,17 +58,17 @@ namespace CardsAgainstMySanity.SharedKernel
 
         public static new Result<TData, TError> Ok(TData data)
         {
-            return new Result<TData, TError>(true, data, null);
+            return new Result<TData, TError>(true, data, default(TError));
         }
 
         public static new Result<TData, TError> Fail()
         {
-            return new Result<TData, TError>(false, null, null);
+            return new Result<TData, TError>(false, default, default(TError));
         }
 
         public static Result<TData, TError> Fail(TError error)
         {
-            return new Result<TData, TError>(false, null, error);
+            return new Result<TData, TError>(false, default, error);
         }
     }
 }

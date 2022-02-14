@@ -3,19 +3,20 @@ using System.Security.Claims;
 using System.Text;
 using CardsAgainstMySanity.Domain.Auth.Repositories;
 using CardsAgainstMySanity.Domain.Auth.Tokens;
+using CardsAgainstMySanity.SharedKernel;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CardsAgainstMySanity.Domain.Auth.Services
 {
     public class TokenService
     {
-        private readonly IGuestRepository _guestRepository;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly TokenSettings _tokenSettings;
 
-        public TokenService(TokenSettings tokenSettings, IGuestRepository guestRepository)
+        public TokenService(TokenSettings tokenSettings, IRefreshTokenRepository refreshTokenRepository)
         {
             _tokenSettings = tokenSettings;
-            _guestRepository = guestRepository;
+            _refreshTokenRepository = refreshTokenRepository;
         }
 
         public string GenerateAccessToken(IUser user)
@@ -50,18 +51,49 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             return refreshToken;
         }
 
-        public async Task<string> Refresh(RefreshToken refreshToken)
+        public Result<string> Refresh(RefreshToken refreshToken, IUser user)
         {
-            if (refreshToken.Expired)
+            if (!IsRefreshTokenValid(refreshToken, user))
             {
-                return null;
+                return Result<string>.Fail();
             }
-            var user = await _guestRepository.FindByIdAsync(refreshToken.UserId);
-            if (user == null)
+            var token = GenerateAccessToken(user);
+            return Result<string>.Ok(token);
+        }
+
+        public bool IsAccessTokenValid(string accessToken, out ClaimsPrincipal principal)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            TokenValidationParameters validationParameters = new()
             {
-                return null;
+                ValidateAudience = true,
+                ValidAudience = _tokenSettings.AccessTokenAudience,
+                ValidateIssuer = true,
+                ValidIssuer = _tokenSettings.AccessTokenIssuer,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenSettings.SecretKey)),
+                ValidateLifetime = true,
+            };
+
+            SecurityToken validatedToken;
+            principal = tokenHandler.ValidateToken(accessToken, validationParameters, out validatedToken);
+            if (principal == null)
+            {
+                return false;
             }
-            return GenerateAccessToken(user);
+            return true;
+        }
+
+        private bool IsRefreshTokenValid(RefreshToken refreshToken, IUser user)
+        {
+            if (refreshToken == null
+                || user == null
+                || refreshToken.Expired
+                || !user.RefreshTokens.Any(t => t.Token == refreshToken.Token))
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

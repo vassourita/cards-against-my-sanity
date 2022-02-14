@@ -6,7 +6,7 @@ namespace CardsAgainstMySanity.Domain.Auth.Dtos
     {
         [Required(ErrorMessage = "{0} is required")]
         [MinLength(1, ErrorMessage = "{0} must be at least {1} characters long.")]
-        [MaxLength(20, ErrorMessage = "{0} must be at most {1} characters long.")]
+        [MaxLength(24, ErrorMessage = "{0} must be at most {1} characters long.")]
         public string Username { get; set; }
     }
 }

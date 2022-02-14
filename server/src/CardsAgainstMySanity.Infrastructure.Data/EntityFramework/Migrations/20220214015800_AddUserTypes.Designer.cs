@@ -3,6 +3,7 @@ using System;
 using CardsAgainstMySanity.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220214015800_AddUserTypes")]
+    partial class AddUserTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,8 +96,7 @@ namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Migrations
                         .HasColumnName("updated_at");
 
                     b.Property<int>("UserTypeId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_type_id");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -127,7 +128,7 @@ namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("user_type", (string)null);
+                    b.ToTable("UserTypeDbModel");
 
                     b.HasData(
                         new

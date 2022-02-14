@@ -3,6 +3,7 @@ using System;
 using CardsAgainstMySanity.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220214014529_UpdateUserTables")]
+    partial class UpdateUserTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,7 +50,7 @@ namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Migrations
                     b.ToTable("refresh_token", (string)null);
                 });
 
-            modelBuilder.Entity("CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Models.UserDbModel", b =>
+            modelBuilder.Entity("CardsAgainstMySanity.Infrastructure.Data.UserDbModel", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -93,10 +95,6 @@ namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<int>("UserTypeId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_type_id");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(24)
@@ -105,76 +103,21 @@ namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserTypeId");
-
                     b.ToTable("user", (string)null);
-                });
-
-            modelBuilder.Entity("CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Models.UserTypeDbModel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(24)
-                        .HasColumnType("character varying(24)")
-                        .HasColumnName("name");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("user_type", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "account"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "guest"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "admin"
-                        });
                 });
 
             modelBuilder.Entity("CardsAgainstMySanity.Domain.Auth.Tokens.RefreshToken", b =>
                 {
-                    b.HasOne("CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Models.UserDbModel", null)
+                    b.HasOne("CardsAgainstMySanity.Infrastructure.Data.UserDbModel", null)
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Models.UserDbModel", b =>
-                {
-                    b.HasOne("CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Models.UserTypeDbModel", "UserType")
-                        .WithMany("Users")
-                        .HasForeignKey("UserTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("UserType");
-                });
-
-            modelBuilder.Entity("CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Models.UserDbModel", b =>
+            modelBuilder.Entity("CardsAgainstMySanity.Infrastructure.Data.UserDbModel", b =>
                 {
                     b.Navigation("RefreshTokens");
-                });
-
-            modelBuilder.Entity("CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Models.UserTypeDbModel", b =>
-                {
-                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }
