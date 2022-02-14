@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using CardsAgainstMySanity.Domain.Auth.Dtos;
 using CardsAgainstMySanity.Domain.Auth.Services;
+using CardsAgainstMySanity.Presentation.Auth.Middlewares;
 using CardsAgainstMySanity.Presentation.Shared;
 using Microsoft.AspNetCore.Mvc;
 
@@ -58,6 +59,7 @@ namespace CardsAgainstMySanity.Presentation.Auth.Controllers
 
         [HttpGet]
         [Route("{id:guid}", Name = "ShowGuest")]
+        [ValidateTokens]
         public async Task<IActionResult> Show([FromRoute] Guid id)
         {
             try

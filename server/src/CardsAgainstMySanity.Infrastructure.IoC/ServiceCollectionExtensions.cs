@@ -31,6 +31,7 @@ namespace CardsAgainstMySanity.Infrastructure.IoC
             // Services
             services.AddScoped<GuestService>();
             services.AddScoped<TokenService>();
+            services.AddScoped<AccessService>();
 
             return services;
         }

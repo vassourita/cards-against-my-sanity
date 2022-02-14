@@ -1,17 +1,58 @@
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using CardsAgainstMySanity.Domain.Auth.Repositories;
+using CardsAgainstMySanity.Domain.Auth.Tokens;
+using Microsoft.IdentityModel.Tokens;
+
 namespace CardsAgainstMySanity.Domain.Auth.Services
 {
     public class AccessService
     {
-        void CanUserAccess(IUser user)
-        {
-            // ** - Um pong acontece a cada 10s
+        private readonly IGuestRepository _guestRepository;
+        private readonly TokenSettings _tokenSettings;
 
-            // -> aspnet valida o access token
-            // -> se o access token estiver expirado, gera um novo access token usando o refresh token
-            // -> se o jogador não responder durante 6 pongs (1 minuto), ele é temporariamente desativado do jogo (até voltar a responder os pongs).
-            // -> se o jogador não responder durante 90 pongs (15 minuto), ele é desconectado do jogo.
-            // -> se o player não responder durante 360 pongs (1 hora), seus tokens são invalidados.
-            // -> refresh token tem como tempo de acesso 24h.
+        public AccessService(IGuestRepository guestRepository, TokenSettings tokenSettings)
+        {
+            _guestRepository = guestRepository;
+            _tokenSettings = tokenSettings;
+        }
+
+        public bool IsAccessTokenValid(string accessToken, out ClaimsPrincipal principal)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            TokenValidationParameters validationParameters = new()
+            {
+                ValidateAudience = true,
+                ValidAudience = _tokenSettings.AccessTokenAudience,
+                ValidateIssuer = true,
+                ValidIssuer = _tokenSettings.AccessTokenIssuer,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenSettings.SecretKey)),
+                ValidateLifetime = true,
+            };
+
+            SecurityToken validatedToken;
+            principal = tokenHandler.ValidateToken(accessToken, validationParameters, out validatedToken);
+            if (principal == null)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public bool IsRefreshTokenValid(string refreshToken)
+        {
+            return true;
+        }
+
+        public string RefreshAccessToken(string refreshToken)
+        {
+            return "";
+        }
+        public bool IsUserAFK(string accessToken)
+        {
+            return true;
         }
     }
 }
