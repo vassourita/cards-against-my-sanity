@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using CardsAgainstMySanity.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
+using CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Mappings;
 
 namespace CardsAgainstMySanity.Infrastructure.IoC
 {
@@ -13,6 +14,12 @@ namespace CardsAgainstMySanity.Infrastructure.IoC
     {
         public static IServiceCollection AddCardsAgainstMySanity(this IServiceCollection services, IConfiguration configuration)
         {
+            // Automapperw
+            services.AddAutoMapper(config =>
+            {
+                config.AddProfile<UserMappingProfile>();
+            });
+
             // Configuration
             services.AddSingleton<TokenSettings>((_) =>
             {
@@ -27,6 +34,7 @@ namespace CardsAgainstMySanity.Infrastructure.IoC
 
             // Repositories
             services.AddScoped<IGuestRepository, EFGuestRepository>();
+            services.AddScoped<IRefreshTokenRepository, EFRefreshTokenRepository>();
 
             // Services
             services.AddScoped<GuestService>();
