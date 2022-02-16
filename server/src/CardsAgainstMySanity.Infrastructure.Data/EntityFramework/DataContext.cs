@@ -1,6 +1,7 @@
 using CardsAgainstMySanity.Domain.Auth.Tokens;
 using CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework
 {
@@ -14,6 +15,7 @@ namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            optionsBuilder.UseLoggerFactory(new LoggerFactory());
         }
 
         public DbSet<UserDbModel> Users { get; set; }

@@ -9,7 +9,8 @@ namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Mappings
         public UserMappingProfile()
         {
             CreateMap<UserDbModel, Guest>()
-                .ReverseMap();
+                .ReverseMap()
+                .ForMember(udbm => udbm.UserTypeId, opt => opt.MapFrom(_ => 2));
 
             CreateMap<UserDbModel, UserAccount>()
                 .ReverseMap();

@@ -19,14 +19,24 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             _refreshTokenRepository = refreshTokenRepository;
         }
 
-        public string GenerateAccessToken(IUser user)
-        {
-            var now = DateTime.UtcNow;
-            var claims = new[]
+        public Claim[] GetClaims(IUser user)
+            => new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
             };
+
+        public ClaimsPrincipal GeneratePrincipal(IUser user)
+        {
+            var claims = GetClaims(user);
+            var identity = new ClaimsIdentity(claims, "Bearer");
+            return new ClaimsPrincipal(identity);
+        }
+
+        public string GenerateAccessToken(IUser user)
+        {
+            var now = DateTime.UtcNow;
+            var claims = GetClaims(user);
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenSettings.SecretKey));
             var creds = new SigningCredentials(key, _tokenSettings.SecurityAlgorithm);
@@ -35,6 +45,7 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
                 issuer: _tokenSettings.AccessTokenIssuer,
                 audience: _tokenSettings.AccessTokenAudience,
                 claims: claims,
+                notBefore: now,
                 expires: now.AddMinutes(_tokenSettings.AccessTokenExpirationInMinutes),
                 signingCredentials: creds);
 
@@ -53,7 +64,7 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
 
         public Result<string> Refresh(RefreshToken refreshToken, IUser user)
         {
-            if (!IsRefreshTokenValid(refreshToken, user))
+            if (!IsRefreshTokenValid(refreshToken))
             {
                 return Result<string>.Fail();
             }
@@ -61,7 +72,13 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             return Result<string>.Ok(token);
         }
 
-        public bool IsAccessTokenValid(string accessToken, out ClaimsPrincipal principal)
+        public enum ValidationError
+        {
+            AccessTokenExpired,
+            AccessTokenInvalid,
+        }
+
+        public Result<ClaimsPrincipal, ValidationError> IsAccessTokenValid(string accessToken)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             TokenValidationParameters validationParameters = new()
@@ -72,24 +89,27 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
                 ValidIssuer = _tokenSettings.AccessTokenIssuer,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenSettings.SecretKey)),
-                ValidateLifetime = true,
             };
 
             SecurityToken validatedToken;
-            principal = tokenHandler.ValidateToken(accessToken, validationParameters, out validatedToken);
-            if (principal == null)
+            try
             {
-                return false;
+                var principal = tokenHandler.ValidateToken(accessToken, validationParameters, out validatedToken);
+                if (validatedToken.ValidTo < DateTime.UtcNow || validatedToken.ValidFrom > DateTime.UtcNow)
+                {
+                    return Result<ClaimsPrincipal, ValidationError>.Fail(ValidationError.AccessTokenExpired);
+                }
+                return Result<ClaimsPrincipal, ValidationError>.Ok(principal);
             }
-            return true;
+            catch (Exception)
+            {
+                return Result<ClaimsPrincipal, ValidationError>.Fail(ValidationError.AccessTokenInvalid);
+            }
         }
 
-        private bool IsRefreshTokenValid(RefreshToken refreshToken, IUser user)
+        private bool IsRefreshTokenValid(RefreshToken refreshToken)
         {
-            if (refreshToken == null
-                || user == null
-                || refreshToken.Expired
-                || !user.RefreshTokens.Any(t => t.Token == refreshToken.Token))
+            if (refreshToken == null || refreshToken.Expired)
             {
                 return false;
             }

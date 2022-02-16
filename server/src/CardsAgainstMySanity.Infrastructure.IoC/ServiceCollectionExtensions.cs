@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using CardsAgainstMySanity.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Mappings;
+using Microsoft.Extensions.Logging;
 
 namespace CardsAgainstMySanity.Infrastructure.IoC
 {
@@ -14,7 +15,14 @@ namespace CardsAgainstMySanity.Infrastructure.IoC
     {
         public static IServiceCollection AddCardsAgainstMySanity(this IServiceCollection services, IConfiguration configuration)
         {
-            // Automapperw
+            services.AddLogging(config =>
+            {
+                config.AddConsole();
+                config.AddDebug();
+                config.SetMinimumLevel(LogLevel.Trace);
+            });
+
+            // Automapper
             services.AddAutoMapper(config =>
             {
                 config.AddProfile<UserMappingProfile>();
