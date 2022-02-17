@@ -9,5 +9,5 @@
         "**/obj": true,
         "**/bin": true,
     },
-    "dotnet-test-explorer.testProjectPath": "**/*Test.@(csproj|vbproj|fsproj)"
+    "dotnet-test-explorer.testProjectPath": "**/*.Test.@(csproj|vbproj|fsproj)"
 }
