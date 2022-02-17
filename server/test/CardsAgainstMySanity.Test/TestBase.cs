@@ -20,7 +20,7 @@ namespace CardsAgainstMySanity.Test
             var services = new ServiceCollection();
 
             services.AddTransient<IDateTimeProvider, FakeDateTimeProvider>(
-                (_) => new FakeDateTimeProvider(DateTime.Now, DateTime.UtcNow));
+            (_) => new FakeDateTimeProvider(DateTime.Now, DateTime.UtcNow));
 
             services.AddTransient<IGuestRepository, FakeGuestRepository>();
             services.AddTransient<IRefreshTokenRepository, FakeRefreshTokenRepository>();
