@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using CardsAgainstMySanity.Domain.Auth.Repositories;
 using CardsAgainstMySanity.Domain.Auth.Tokens;
+using System.Linq;
 
 namespace CardsAgainstMySanity.Domain.Test.Auth.Assets
 {
@@ -21,6 +22,11 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Assets
             return Task.CompletedTask;
         }
 
+        public Task<int> CountAsync()
+        {
+            return Task.FromResult(_refreshTokens.Count);
+        }
+
         public Task DeleteAsync(RefreshToken entity)
         {
             _refreshTokens.Remove(entity);
@@ -34,12 +40,12 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Assets
 
         public Task<RefreshToken> FindByIdAsync(Guid id)
         {
-            return Task.FromResult(_refreshTokens.Find(x => x.Token == id));
+            var refreshToken = _refreshTokens.FirstOrDefault(x => x.Token == id);
+            return Task.FromResult(refreshToken);
         }
 
         public Task RollbackAsync()
         {
-            _refreshTokens.Clear();
             return Task.CompletedTask;
         }
 

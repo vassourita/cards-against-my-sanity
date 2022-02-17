@@ -14,6 +14,14 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
 {
     public class TokenServiceTest
     {
+        private readonly IDateTimeProvider _dateTimeProvider;
+
+        public TokenServiceTest()
+        {
+            _dateTimeProvider = new FakeDateTimeProvider(DateTime.Now, DateTime.UtcNow);
+        }
+
+        #region factories
         private TokenSettings MakeSutSettings()
             => new()
             {
@@ -38,14 +46,9 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
                 ipAddress: "test-ip-address",
                 avatarUrl: "test-avatar-url"
             );
+        #endregion
 
-        private readonly IDateTimeProvider _dateTimeProvider;
-
-        public TokenServiceTest()
-        {
-            _dateTimeProvider = new FakeDateTimeProvider(DateTime.Now, DateTime.UtcNow);
-        }
-
+        #region testCases
         [Fact]
         public void GetClaims_ShouldReturnCorrectClaims()
         {
@@ -271,5 +274,6 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             isValid1.Should().BeFalse();
             isValid2.Should().BeFalse();
         }
+        #endregion
     }
 }

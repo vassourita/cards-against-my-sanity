@@ -8,7 +8,7 @@ namespace CardsAgainstMySanity.Infrastructure.Validators
 {
     public class GuestInitSessionDtoValidationAdapter : AbstractValidator<GuestInitSessionDto>, IModelValidator<GuestInitSessionDto>
     {
-        public GuestInitSessionDtoValidationAdapter(GuestInitSessionDto dto)
+        public GuestInitSessionDtoValidationAdapter()
         {
             AddRules();
         }

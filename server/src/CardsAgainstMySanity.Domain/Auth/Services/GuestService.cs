@@ -2,6 +2,7 @@ using CardsAgainstMySanity.Domain.Auth.Dtos;
 using CardsAgainstMySanity.Domain.Auth.Repositories;
 using CardsAgainstMySanity.Domain.Providers;
 using CardsAgainstMySanity.SharedKernel;
+using CardsAgainstMySanity.SharedKernel.Validation;
 
 namespace CardsAgainstMySanity.Domain.Auth.Services
 {
@@ -11,27 +12,38 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
         private readonly IGuestRepository _guestRepository;
         private readonly TokenService _tokenService;
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IModelValidator<GuestInitSessionDto> _guestInitSessionDtoValidator;
 
-        public GuestService(IGuestRepository guestRepository, TokenService tokenService, IDateTimeProvider dateTimeProvider)
+        public GuestService(IGuestRepository guestRepository,
+                            TokenService tokenService,
+                            IDateTimeProvider dateTimeProvider,
+                            IModelValidator<GuestInitSessionDto> guestInitSessionDtoValidator)
         {
             _guestRepository = guestRepository;
             _tokenService = tokenService;
             _dateTimeProvider = dateTimeProvider;
+            _guestInitSessionDtoValidator = guestInitSessionDtoValidator;
         }
 
-        public async Task<Result<Guest>> InitSession(GuestInitSessionDto guestInitSessionDto, string ipAddress)
+        public async Task<Result<Guest, ValidationErrorList>> InitSession(GuestInitSessionDto guestInitSessionDto)
         {
-            var guest = new Guest(guestInitSessionDto.Username, ipAddress, "", _dateTimeProvider);
+            var validationResult = _guestInitSessionDtoValidator.Validate(guestInitSessionDto);
+            if (validationResult.Failed)
+            {
+                return Result<Guest, ValidationErrorList>.Fail(validationResult.Error);
+            }
+
+            var guest = new Guest(guestInitSessionDto.Username, guestInitSessionDto.IpAddress, "", _dateTimeProvider);
 
             var accessToken = _tokenService.GenerateAccessToken(guest);
-            guest.SetAccessToken(accessToken, ipAddress);
+            guest.SetAccessToken(accessToken, guestInitSessionDto.IpAddress);
             var refreshToken = _tokenService.GenerateRefreshToken(true);
             guest.AddRefreshToken(refreshToken);
 
             await _guestRepository.AddAsync(guest);
             await _guestRepository.CommitAsync();
 
-            return Result<Guest>.Ok(guest);
+            return Result<Guest, ValidationErrorList>.Ok(guest);
         }
 
         public async Task<Guest> GetGuestById(Guid id)

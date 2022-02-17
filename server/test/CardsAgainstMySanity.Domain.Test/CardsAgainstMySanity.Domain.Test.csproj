@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\CardsAgainstMySanity.Domain\CardsAgainstMySanity.Domain.csproj" />
+    <ProjectReference Include="..\..\src\CardsAgainstMySanity.Infrastructure\CardsAgainstMySanity.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\CardsAgainstMySanity.SharedKernel\CardsAgainstMySanity.SharedKernel.csproj" />
   </ItemGroup>
 

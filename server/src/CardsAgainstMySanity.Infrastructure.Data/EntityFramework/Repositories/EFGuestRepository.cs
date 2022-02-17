@@ -49,6 +49,11 @@ namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Repositories
             return guest;
         }
 
+        public async Task<int> CountAsync()
+        {
+            return await _guests.CountAsync();
+        }
+
         public Task UpdateAsync(Guest entity)
         {
             var user = _mapper.Map<UserDbModel>(entity);

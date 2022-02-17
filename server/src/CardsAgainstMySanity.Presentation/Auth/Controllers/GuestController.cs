@@ -24,8 +24,8 @@ namespace CardsAgainstMySanity.Presentation.Auth.Controllers
         {
             try
             {
-                var ipAddress = GetIpAddress();
-                var result = await _guestService.InitSession(dto, ipAddress);
+                dto.IpAddress = GetIpAddress();
+                var result = await _guestService.InitSession(dto);
 
                 if (result.Failed)
                 {

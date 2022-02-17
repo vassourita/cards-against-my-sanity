@@ -34,6 +34,11 @@ namespace CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Repositories
             return await _refreshTokens.FirstOrDefaultAsync(t => t.Token == id);
         }
 
+        public async Task<int> CountAsync()
+        {
+            return await _refreshTokens.CountAsync();
+        }
+
         public Task UpdateAsync(RefreshToken entity)
         {
             _refreshTokens.Update(entity);
