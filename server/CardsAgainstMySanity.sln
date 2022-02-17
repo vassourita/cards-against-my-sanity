@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardsAgainstMySanity.Infras
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardsAgainstMySanity.Presentation.Test", "test\CardsAgainstMySanity.Presentation.Test\CardsAgainstMySanity.Presentation.Test.csproj", "{EED784E6-D31B-4C9E-AA83-0C6BDDE7178A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardsAgainstMySanity.Test", "test\CardsAgainstMySanity.Test\CardsAgainstMySanity.Test.csproj", "{22B94D83-8C3C-4FE6-9B64-274349B94EAA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,6 +72,10 @@ Global
 		{EED784E6-D31B-4C9E-AA83-0C6BDDE7178A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EED784E6-D31B-4C9E-AA83-0C6BDDE7178A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EED784E6-D31B-4C9E-AA83-0C6BDDE7178A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22B94D83-8C3C-4FE6-9B64-274349B94EAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22B94D83-8C3C-4FE6-9B64-274349B94EAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22B94D83-8C3C-4FE6-9B64-274349B94EAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22B94D83-8C3C-4FE6-9B64-274349B94EAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{91B7942D-EF5C-461B-8155-256570C379D1} = {08F791BA-9BAB-469F-A72E-D65017C19F00}
@@ -81,5 +87,6 @@ Global
 		{0294AB4C-FE55-4D8E-80DB-E73CCDB680D0} = {49C8B6AA-9BAB-4DC1-BDB7-DEBD07A7F729}
 		{069DFE54-58F0-41C4-A95F-150DE603CF1F} = {49C8B6AA-9BAB-4DC1-BDB7-DEBD07A7F729}
 		{EED784E6-D31B-4C9E-AA83-0C6BDDE7178A} = {49C8B6AA-9BAB-4DC1-BDB7-DEBD07A7F729}
+		{22B94D83-8C3C-4FE6-9B64-274349B94EAA} = {49C8B6AA-9BAB-4DC1-BDB7-DEBD07A7F729}
 	EndGlobalSection
 EndGlobal

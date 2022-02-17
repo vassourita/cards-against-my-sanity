@@ -1,7 +1,7 @@
 using System;
 using CardsAgainstMySanity.Domain.Providers;
 
-namespace CardsAgainstMySanity.Domain.Test.Auth.Assets
+namespace CardsAgainstMySanity.Test.Assets
 {
     public class FakeDateTimeProvider : IDateTimeProvider
     {

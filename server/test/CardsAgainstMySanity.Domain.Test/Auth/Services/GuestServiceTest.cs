@@ -1,55 +1,33 @@
-using System;
 using CardsAgainstMySanity.Domain.Auth.Services;
-using CardsAgainstMySanity.Domain.Auth.Tokens;
-using CardsAgainstMySanity.Domain.Test.Auth.Assets;
 using Xunit;
 using FluentAssertions;
 using CardsAgainstMySanity.Domain.Providers;
 using CardsAgainstMySanity.Domain.Auth.Repositories;
 using CardsAgainstMySanity.Domain.Auth.Dtos;
-using CardsAgainstMySanity.Infrastructure.Validators;
+using CardsAgainstMySanity.Test;
+using Microsoft.Extensions.DependencyInjection;
+using CardsAgainstMySanity.SharedKernel.Validation;
 
 namespace CardsAgainstMySanity.Domain.Test.Auth.Services
 {
-    public class GuestServiceTest
+    public class GuestServiceTest : TestBase
     {
         private readonly IDateTimeProvider _dateTimeProvider;
-        private readonly IGuestRepository _fakeGuestRepository;
+        private readonly IGuestRepository _guestRepository;
 
-        public GuestServiceTest()
+        public GuestServiceTest() : base()
         {
-            _dateTimeProvider = new FakeDateTimeProvider(DateTime.Now, DateTime.UtcNow);
-            _fakeGuestRepository = MakeFakeGuestRepository();
+            _dateTimeProvider = ServiceProvider.GetRequiredService<IDateTimeProvider>();
+            _guestRepository = ServiceProvider.GetRequiredService<IGuestRepository>();
         }
 
-        #region factories
         private GuestService MakeSut()
             => new(
-                _fakeGuestRepository,
-                MakeTokenService(),
+                _guestRepository,
+                ServiceProvider.GetRequiredService<TokenService>(),
                 _dateTimeProvider,
-                new GuestInitSessionDtoValidationAdapter());
+                ServiceProvider.GetRequiredService<IModelValidator<GuestInitSessionDto>>());
 
-        private IGuestRepository MakeFakeGuestRepository()
-            => new FakeGuestRepository();
-
-        private TokenSettings MakeSutSettings()
-          => new()
-          {
-              AccessTokenExpirationInMinutes = 1,
-              GuestRefreshTokenExpirationInMinutes = 2,
-              UserAccountRefreshTokenExpirationInMinutes = 2,
-              AccessTokenIssuer = "test-issuer",
-              AccessTokenAudience = "test-audience",
-              SecretKey = "ae2b1fca515949e5d54fb22b8ed95575"
-          };
-
-        private TokenService MakeTokenService()
-            => new(
-                MakeSutSettings(),
-                new FakeRefreshTokenRepository(),
-                _dateTimeProvider);
-        #endregion
         #region testCases
         [Fact]
         public async void InitSession_ValidDTO_ShouldSucceed()
@@ -69,7 +47,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             result.Data.AccessToken.Should().NotBeNullOrEmpty();
             result.Data.RefreshTokens.Should().HaveCountGreaterThan(0);
 
-            var dbResult = await _fakeGuestRepository.FindByIdAsync(result.Data.Id);
+            var dbResult = await _guestRepository.FindByIdAsync(result.Data.Id);
             dbResult.Should().NotBeNull();
         }
 
@@ -90,7 +68,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             result.Error.Should().NotBeNull()
                 .And.HaveCount(1);
 
-            var dbResult = await _fakeGuestRepository.CountAsync();
+            var dbResult = await _guestRepository.CountAsync();
             dbResult.Should().Be(0);
         }
 
@@ -111,7 +89,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             result.Error.Should().NotBeNull()
                 .And.HaveCount(1);
 
-            var dbResult = await _fakeGuestRepository.CountAsync();
+            var dbResult = await _guestRepository.CountAsync();
             dbResult.Should().Be(0);
         }
 
@@ -132,7 +110,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             result.Error.Should().NotBeNull()
                 .And.HaveCount(1);
 
-            var dbResult = await _fakeGuestRepository.CountAsync();
+            var dbResult = await _guestRepository.CountAsync();
             dbResult.Should().Be(0);
         }
     }

@@ -4,39 +4,32 @@ using System.Security.Claims;
 using System.Text;
 using CardsAgainstMySanity.Domain.Auth.Services;
 using CardsAgainstMySanity.Domain.Auth.Tokens;
-using CardsAgainstMySanity.Domain.Test.Auth.Assets;
+using CardsAgainstMySanity.Test.Assets;
 using Microsoft.IdentityModel.Tokens;
 using Xunit;
 using FluentAssertions;
 using CardsAgainstMySanity.Domain.Providers;
+using CardsAgainstMySanity.Test;
+using Microsoft.Extensions.DependencyInjection;
+using CardsAgainstMySanity.Domain.Auth.Repositories;
 
 namespace CardsAgainstMySanity.Domain.Test.Auth.Services
 {
-    public class TokenServiceTest
+    public class TokenServiceTest : TestBase
     {
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly TokenSettings _tokenSettings;
 
         public TokenServiceTest()
         {
-            _dateTimeProvider = new FakeDateTimeProvider(DateTime.Now, DateTime.UtcNow);
+            _dateTimeProvider = ServiceProvider.GetRequiredService<IDateTimeProvider>();
+            _tokenSettings = ServiceProvider.GetRequiredService<TokenSettings>();
         }
-
-        #region factories
-        private TokenSettings MakeSutSettings()
-            => new()
-            {
-                AccessTokenExpirationInMinutes = 1,
-                GuestRefreshTokenExpirationInMinutes = 2,
-                UserAccountRefreshTokenExpirationInMinutes = 2,
-                AccessTokenIssuer = "test-issuer",
-                AccessTokenAudience = "test-audience",
-                SecretKey = "ae2b1fca515949e5d54fb22b8ed95575"
-            };
 
         private TokenService MakeSut()
             => new(
-                MakeSutSettings(),
-                new FakeRefreshTokenRepository(),
+                _tokenSettings,
+                ServiceProvider.GetRequiredService<IRefreshTokenRepository>(),
                 _dateTimeProvider);
 
         private TestUser MakeUser()
@@ -46,7 +39,6 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
                 ipAddress: "test-ip-address",
                 avatarUrl: "test-avatar-url"
             );
-        #endregion
 
         #region testCases
         [Fact]
@@ -102,7 +94,6 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             // Arrange
             var sut = MakeSut();
             var user = MakeUser();
-            var settings = MakeSutSettings();
 
             // Act
             var token = sut.GenerateAccessToken(user);
@@ -110,7 +101,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
                 .ValidateToken(token,
                 new TokenValidationParameters()
                 {
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SecretKey)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenSettings.SecretKey)),
                     ValidateIssuer = false, //
                     ValidateAudience = false, //
                     ValidateLifetime = false, //
@@ -118,16 +109,16 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             var jwt = validatedToken as JwtSecurityToken;
 
             // Assert
-            jwt.Issuer.Should().Be(settings.AccessTokenIssuer);
+            jwt.Issuer.Should().Be(_tokenSettings.AccessTokenIssuer);
 
-            jwt.Audiences.Should().Contain(settings.AccessTokenAudience);
+            jwt.Audiences.Should().Contain(_tokenSettings.AccessTokenAudience);
 
             var validFromNoMs = RemoveMs(_dateTimeProvider.UtcNow);
 
             jwt.ValidFrom
                 .Should().Be(validFromNoMs);
 
-            var validToNoMs = RemoveMs(_dateTimeProvider.UtcNow.AddMinutes(settings.AccessTokenExpirationInMinutes));
+            var validToNoMs = RemoveMs(_dateTimeProvider.UtcNow.AddMinutes(_tokenSettings.AccessTokenExpirationInMinutes));
             jwt.ValidTo
                 .Should().Be(validToNoMs);
 
@@ -157,7 +148,6 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
         {
             // Arrange
             var sut = MakeSut();
-            var settings = MakeSutSettings();
 
             // Act
             var token = sut.GenerateRefreshToken(true);
@@ -165,7 +155,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             // Assert
             token.Should().NotBeNull();
             token.ExpiresAt
-                .Should().Be(_dateTimeProvider.UtcNow.AddMinutes(settings.UserAccountRefreshTokenExpirationInMinutes));
+                .Should().Be(_dateTimeProvider.UtcNow.AddMinutes(_tokenSettings.UserAccountRefreshTokenExpirationInMinutes));
             token.CreatedAt
                 .Should().Be(_dateTimeProvider.UtcNow);
             token.UserId
@@ -177,7 +167,6 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
         {
             // Arrange
             var sut = MakeSut();
-            var settings = MakeSutSettings();
             var user = MakeUser();
             var token = sut.GenerateRefreshToken(true);
 
@@ -195,7 +184,6 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
         {
             // Arrange
             var sut = MakeSut();
-            var settings = MakeSutSettings();
             var user = MakeUser();
             var token = new RefreshToken(
                 Guid.NewGuid(),
@@ -216,7 +204,6 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
         {
             // Arrange
             var sut = MakeSut();
-            var settings = MakeSutSettings();
             var user = MakeUser();
             var token = sut.GenerateAccessToken(user);
 

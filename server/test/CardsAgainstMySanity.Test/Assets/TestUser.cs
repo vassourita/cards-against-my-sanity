@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using CardsAgainstMySanity.Domain.Auth;
 using CardsAgainstMySanity.Domain.Auth.Tokens;
 
-namespace CardsAgainstMySanity.Domain.Test.Auth.Assets
+namespace CardsAgainstMySanity.Test.Assets
 {
     public class TestUser : IUser
     {

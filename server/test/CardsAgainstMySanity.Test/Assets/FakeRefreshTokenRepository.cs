@@ -5,7 +5,7 @@ using CardsAgainstMySanity.Domain.Auth.Repositories;
 using CardsAgainstMySanity.Domain.Auth.Tokens;
 using System.Linq;
 
-namespace CardsAgainstMySanity.Domain.Test.Auth.Assets
+namespace CardsAgainstMySanity.Test.Assets
 {
     public class FakeRefreshTokenRepository : IRefreshTokenRepository
     {

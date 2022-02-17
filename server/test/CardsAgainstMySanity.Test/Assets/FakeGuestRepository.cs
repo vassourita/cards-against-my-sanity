@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using CardsAgainstMySanity.Domain.Auth;
 using CardsAgainstMySanity.Domain.Auth.Repositories;
 
-namespace CardsAgainstMySanity.Domain.Test.Auth.Assets
+namespace CardsAgainstMySanity.Test.Assets
 {
-    class FakeGuestRepository : IGuestRepository
+    public class FakeGuestRepository : IGuestRepository
     {
         private readonly List<Guest> _guests = new List<Guest>();
 
