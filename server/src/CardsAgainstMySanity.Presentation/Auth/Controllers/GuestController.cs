@@ -22,9 +22,6 @@ namespace CardsAgainstMySanity.Presentation.Auth.Controllers
         [HttpPost]
         public async Task<IActionResult> InitSession(GuestInitSessionDto dto)
         {
-            if (IsInvalidModelState(out var response))
-                return response;
-
             try
             {
                 var ipAddress = GetIpAddress();
