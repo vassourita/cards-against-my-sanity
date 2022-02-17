@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using CardsAgainstMySanity.Domain.Auth.Repositories;
 using CardsAgainstMySanity.Domain.Auth.Tokens;
+using CardsAgainstMySanity.Domain.Providers;
 using CardsAgainstMySanity.SharedKernel;
 using Microsoft.IdentityModel.Tokens;
 
@@ -12,11 +13,13 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
     {
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly TokenSettings _tokenSettings;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public TokenService(TokenSettings tokenSettings, IRefreshTokenRepository refreshTokenRepository)
+        public TokenService(TokenSettings tokenSettings, IRefreshTokenRepository refreshTokenRepository, IDateTimeProvider dateTimeProvider)
         {
             _tokenSettings = tokenSettings;
             _refreshTokenRepository = refreshTokenRepository;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public Claim[] GetClaims(IUser user)
@@ -35,7 +38,7 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
 
         public string GenerateAccessToken(IUser user)
         {
-            var now = DateTime.UtcNow;
+            var now = _dateTimeProvider.UtcNow;
             var claims = GetClaims(user);
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenSettings.SecretKey));
@@ -54,11 +57,11 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
 
         public RefreshToken GenerateRefreshToken(bool isGuest)
         {
-            var expiration = DateTime.UtcNow.AddMinutes(
+            var now = _dateTimeProvider.UtcNow;
+            var expiration = now.AddMinutes(
                 isGuest ? _tokenSettings.GuestRefreshTokenExpirationInMinutes : _tokenSettings.UserAccountRefreshTokenExpirationInMinutes
             );
-            var now = DateTime.UtcNow;
-            var refreshToken = new RefreshToken(Guid.NewGuid().ToString(), expiration);
+            var refreshToken = new RefreshToken(Guid.NewGuid().ToString(), expiration, _dateTimeProvider);
             return refreshToken;
         }
 
@@ -94,8 +97,9 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             SecurityToken validatedToken;
             try
             {
+                var now = _dateTimeProvider.UtcNow;
                 var principal = tokenHandler.ValidateToken(accessToken, validationParameters, out validatedToken);
-                if (validatedToken.ValidTo < DateTime.UtcNow || validatedToken.ValidFrom > DateTime.UtcNow)
+                if (validatedToken.ValidTo < now || validatedToken.ValidFrom > now)
                 {
                     return Result<ClaimsPrincipal, ValidationError>.Fail(ValidationError.AccessTokenExpired);
                 }

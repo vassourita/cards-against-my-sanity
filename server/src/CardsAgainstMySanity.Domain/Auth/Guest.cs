@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CardsAgainstMySanity.Domain.Auth.Tokens;
+using CardsAgainstMySanity.Domain.Providers;
 
 namespace CardsAgainstMySanity.Domain.Auth
 {
@@ -11,13 +12,13 @@ namespace CardsAgainstMySanity.Domain.Auth
             RefreshTokens = new Collection<RefreshToken>();
         }
 
-        public Guest(string username, string ipAddress, string avatarUrl)
+        public Guest(string username, string ipAddress, string avatarUrl, IDateTimeProvider dateTimeProvider)
         {
             Id = Guid.NewGuid();
             Username = username;
             IpAddress = ipAddress;
             AvatarUrl = avatarUrl;
-            CreatedAt = DateTime.UtcNow;
+            CreatedAt = dateTimeProvider.UtcNow;
             RefreshTokens = new Collection<RefreshToken>();
         }
 

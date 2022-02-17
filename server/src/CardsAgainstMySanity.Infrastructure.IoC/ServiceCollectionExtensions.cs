@@ -8,6 +8,8 @@ using CardsAgainstMySanity.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Mappings;
 using Microsoft.Extensions.Logging;
+using CardsAgainstMySanity.Domain.Providers;
+using CardsAgainstMySanity.Infrastructure.Providers;
 
 namespace CardsAgainstMySanity.Infrastructure.IoC
 {
@@ -21,6 +23,9 @@ namespace CardsAgainstMySanity.Infrastructure.IoC
                 config.AddDebug();
                 config.SetMinimumLevel(LogLevel.Trace);
             });
+
+            // Providers
+            services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
 
             // Automapper
             services.AddAutoMapper(config =>

@@ -1,3 +1,5 @@
+using CardsAgainstMySanity.Domain.Providers;
+
 namespace CardsAgainstMySanity.Domain.Auth.Tokens
 {
     public class RefreshToken
@@ -13,11 +15,11 @@ namespace CardsAgainstMySanity.Domain.Auth.Tokens
         protected RefreshToken()
         { }
 
-        public RefreshToken(string token, DateTime expiresAt)
+        public RefreshToken(string token, DateTime expiresAt, IDateTimeProvider dateTimeProvider)
         {
             Token = Guid.Parse(token);
             ExpiresAt = expiresAt;
-            CreatedAt = DateTime.UtcNow;
+            CreatedAt = dateTimeProvider.UtcNow;
         }
     }
 }

@@ -1,5 +1,6 @@
 using CardsAgainstMySanity.Domain.Auth.Dtos;
 using CardsAgainstMySanity.Domain.Auth.Repositories;
+using CardsAgainstMySanity.Domain.Providers;
 using CardsAgainstMySanity.SharedKernel;
 
 namespace CardsAgainstMySanity.Domain.Auth.Services
@@ -9,16 +10,18 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
     {
         private readonly IGuestRepository _guestRepository;
         private readonly TokenService _tokenService;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
-        public GuestService(IGuestRepository guestRepository, TokenService tokenService)
+        public GuestService(IGuestRepository guestRepository, TokenService tokenService, IDateTimeProvider dateTimeProvider)
         {
             _guestRepository = guestRepository;
             _tokenService = tokenService;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task<Result<Guest>> InitSession(GuestInitSessionDto guestInitSessionDto, string ipAddress)
         {
-            var guest = new Guest(guestInitSessionDto.Username, ipAddress, "");
+            var guest = new Guest(guestInitSessionDto.Username, ipAddress, "", _dateTimeProvider);
 
             var accessToken = _tokenService.GenerateAccessToken(guest);
             guest.SetAccessToken(accessToken, ipAddress);
