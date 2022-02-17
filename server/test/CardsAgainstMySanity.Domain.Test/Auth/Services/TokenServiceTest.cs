@@ -168,5 +168,108 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             token.UserId
                 .Should().Be(Guid.Empty);
         }
+
+        [Fact]
+        public void Refresh_ShouldRefreshValidTokens()
+        {
+            // Arrange
+            var sut = MakeSut();
+            var settings = MakeSutSettings();
+            var user = MakeUser();
+            var token = sut.GenerateRefreshToken(true);
+
+            // Act
+            var newTokenResult = sut.Refresh(token, user);
+
+            // Assert
+            newTokenResult.Succeeded.Should().BeTrue();
+            newTokenResult.Data
+                .Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public void Refresh_ShouldNotRefreshInvalidToken()
+        {
+            // Arrange
+            var sut = MakeSut();
+            var settings = MakeSutSettings();
+            var user = MakeUser();
+            var token = new RefreshToken(
+                Guid.NewGuid(),
+                _dateTimeProvider.UtcNow.AddMinutes(-1),
+                _dateTimeProvider);
+
+            // Act
+            var newTokenResult = sut.Refresh(token, user);
+
+            // Assert
+            newTokenResult.Failed.Should().BeTrue();
+            newTokenResult.Data
+                .Should().Be(default(string));
+        }
+
+        [Fact]
+        public void IsAccessTokenValid_ShouldReturnTrueForValidToken()
+        {
+            // Arrange
+            var sut = MakeSut();
+            var settings = MakeSutSettings();
+            var user = MakeUser();
+            var token = sut.GenerateAccessToken(user);
+
+            // Act
+            var isValidResult = sut.IsAccessTokenValid(token);
+
+            // Assert
+            isValidResult.Succeeded.Should().BeTrue();
+        }
+
+        [Fact]
+        public void IsAccessTokenValid_ShouldReturnFalseForInValidToken()
+        {
+            // Arrange
+            var sut = MakeSut();
+            var token = "somejwttoken";
+
+            // Act
+            var isValidResult = sut.IsAccessTokenValid(token);
+
+            // Assert
+            isValidResult.Succeeded.Should().BeFalse();
+        }
+
+        [Fact]
+        public void IsRefreshTokenValid_ShouldReturnTrueForValidToken()
+        {
+            // Arrange
+            var sut = MakeSut();
+            var token = sut.GenerateRefreshToken(true);
+
+            // Act
+            var isValid = sut.IsRefreshTokenValid(token);
+
+            // Assert
+            isValid.Should().BeTrue();
+        }
+
+        [Fact]
+        public void IsRefreshTokenValid_ShouldReturnFalseForInvalidToken()
+        {
+            // Arrange
+            var sut = MakeSut();
+            var token1 = new RefreshToken(
+                Guid.NewGuid(),
+                _dateTimeProvider.UtcNow.AddMinutes(-1),
+                _dateTimeProvider);
+            RefreshToken token2 = null;
+
+            // Act
+            var isValid1 = sut.IsRefreshTokenValid(token1);
+            var isValid2 = sut.IsRefreshTokenValid(token2);
+
+            // Assert
+            isValid1.Should().BeFalse();
+            isValid2.Should().BeFalse();
+        }
     }
 }

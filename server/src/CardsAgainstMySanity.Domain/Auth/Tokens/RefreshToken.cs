@@ -15,9 +15,9 @@ namespace CardsAgainstMySanity.Domain.Auth.Tokens
         protected RefreshToken()
         { }
 
-        public RefreshToken(string token, DateTime expiresAt, IDateTimeProvider dateTimeProvider)
+        public RefreshToken(Guid token, DateTime expiresAt, IDateTimeProvider dateTimeProvider)
         {
-            Token = Guid.Parse(token);
+            Token = token;
             ExpiresAt = expiresAt;
             CreatedAt = dateTimeProvider.UtcNow;
         }

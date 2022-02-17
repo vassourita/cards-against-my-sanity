@@ -61,7 +61,7 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             var expiration = now.AddMinutes(
                 isGuest ? _tokenSettings.GuestRefreshTokenExpirationInMinutes : _tokenSettings.UserAccountRefreshTokenExpirationInMinutes
             );
-            var refreshToken = new RefreshToken(Guid.NewGuid().ToString(), expiration, _dateTimeProvider);
+            var refreshToken = new RefreshToken(Guid.NewGuid(), expiration, _dateTimeProvider);
             return refreshToken;
         }
 
@@ -111,7 +111,7 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             }
         }
 
-        private bool IsRefreshTokenValid(RefreshToken refreshToken)
+        public bool IsRefreshTokenValid(RefreshToken refreshToken)
         {
             if (refreshToken == null || refreshToken.Expired)
             {
