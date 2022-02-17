@@ -8,5 +8,6 @@
         "**/Thumbs.db": true,
         "**/obj": true,
         "**/bin": true,
-    }
+    },
+    "dotnet-test-explorer.testProjectPath": "**/*.Test.@(csproj|vbproj|fsproj)"
 }
