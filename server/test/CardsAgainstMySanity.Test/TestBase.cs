@@ -35,6 +35,7 @@ namespace CardsAgainstMySanity.Test
                     AccessTokenAudience = "test-audience",
                     SecretKey = "ae2b1fca515949e5d54fb22b8ed95575"
                 });
+                
             services.AddTransient<TokenService>((s) => new(
                 s.GetRequiredService<TokenSettings>(),
                 s.GetRequiredService<IRefreshTokenRepository>(),
