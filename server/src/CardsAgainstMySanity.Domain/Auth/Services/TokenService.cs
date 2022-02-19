@@ -22,6 +22,9 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             _dateTimeProvider = dateTimeProvider;
         }
 
+        // for moq
+        protected TokenService() { }
+
         public Claim[] GetClaims(IUser user)
             => new[]
             {
@@ -81,7 +84,7 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             AccessTokenInvalid,
         }
 
-        public Result<ClaimsPrincipal, ValidationError> IsAccessTokenValid(string accessToken)
+        public virtual Result<ClaimsPrincipal, ValidationError> IsAccessTokenValid(string accessToken)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             TokenValidationParameters validationParameters = new()

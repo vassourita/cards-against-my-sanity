@@ -1,0 +1,17 @@
+{
+  "name": "cards-against-my-sanity",
+  "version": "1.0.0",
+  "repository": "https://github.com/vassourita/cards-against-my-sanity.git",
+  "devDependencies": {
+    "husky": "^7.0.0",
+    "lint-staged": "^12.3.4"
+  },
+  "scripts": {
+    "prepare": "husky install",
+    "test": "cd server && dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=\"lcov%2ccobertura%2copencover\"",
+    "preinstall": "dotnet tool restore"
+  },
+  "lint-staged": {
+    "*.cs": "dotnet format ./server --include"
+  }
+}

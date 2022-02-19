@@ -27,9 +27,10 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
         {
             var mock = new Mock<TokenService>();
             mock.Setup(x => x.IsAccessTokenValid("valid-token"))
-                .Returns(Result<ClaimsPrincipal, TokenService.ValidationError>.Ok(new ClaimsPrincipal()));
+            .Returns(Result<ClaimsPrincipal, TokenService.ValidationError>.Ok(new ClaimsPrincipal()));
             return mock;
         }
+
         private AccessService MakeSut() => new AccessService(
             ServiceProvider.GetRequiredService<IRefreshTokenRepository>(),
             MakeMockTokenService().Object,
@@ -51,12 +52,11 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
         public async void ValidateUserTokens_ValidTokens_ShouldSucceed()
         {
             var refreshToken = MakeRefreshToken();
-            // Arrange
 
+            // Arrange
             var sut = MakeSut();
 
             // Act
-
             var result = await sut.ValidateUserTokens("valid-token", refreshToken.Token);
 
             // Assert
