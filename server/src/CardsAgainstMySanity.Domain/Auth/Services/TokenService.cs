@@ -83,11 +83,20 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             AccessTokenExpired,
             AccessTokenInvalid,
         }
+        public virtual ClaimsPrincipal ValidateJWT (string token, TokenValidationParameters validationParameters){
+            var tokenHandler = new JwtSecurityTokenHandler();
+            SecurityToken validatedToken;
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
 
+            if (validatedToken.ValidTo < _dateTimeProvider.UtcNow || validatedToken.ValidFrom > _dateTimeProvider.UtcNow)
+            {
+                throw new SecurityTokenExpiredException();
+            }
+            return principal;
+        }
         public virtual Result<ClaimsPrincipal, ValidationError> IsAccessTokenValid(string accessToken)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            TokenValidationParameters validationParameters = new()
+            TokenValidationParameters validationParameters = new() // shouldn't be put here, I guess
             {
                 ValidateAudience = true,
                 ValidAudience = _tokenSettings.AccessTokenAudience,
@@ -96,16 +105,9 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenSettings.SecretKey)),
             };
-
-            SecurityToken validatedToken;
             try
             {
-                var now = _dateTimeProvider.UtcNow;
-                var principal = tokenHandler.ValidateToken(accessToken, validationParameters, out validatedToken);
-                if (validatedToken.ValidTo < now || validatedToken.ValidFrom > now)
-                {
-                    return Result<ClaimsPrincipal, ValidationError>.Fail(ValidationError.AccessTokenExpired);
-                }
+                var principal = ValidateJWT(accessToken, validationParameters);
                 return Result<ClaimsPrincipal, ValidationError>.Ok(principal);
             }
             catch (Exception)
@@ -113,7 +115,6 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
                 return Result<ClaimsPrincipal, ValidationError>.Fail(ValidationError.AccessTokenInvalid);
             }
         }
-
         public bool IsRefreshTokenValid(RefreshToken refreshToken)
         {
             if (refreshToken == null || refreshToken.Expired)
