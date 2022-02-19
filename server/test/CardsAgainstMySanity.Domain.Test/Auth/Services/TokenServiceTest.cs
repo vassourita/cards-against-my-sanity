@@ -12,6 +12,8 @@ using CardsAgainstMySanity.Domain.Providers;
 using CardsAgainstMySanity.Test;
 using Microsoft.Extensions.DependencyInjection;
 using CardsAgainstMySanity.Domain.Auth.Repositories;
+using Moq;
+using CardsAgainstMySanity.SharedKernel;
 
 namespace CardsAgainstMySanity.Domain.Test.Auth.Services
 {
@@ -19,17 +21,18 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
     {
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly TokenSettings _tokenSettings;
-
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
         public TokenServiceTest()
         {
             _dateTimeProvider = ServiceProvider.GetRequiredService<IDateTimeProvider>();
             _tokenSettings = ServiceProvider.GetRequiredService<TokenSettings>();
+            _refreshTokenRepository = ServiceProvider.GetRequiredService<IRefreshTokenRepository>();
         }
-
+        #region factories
         private TokenService MakeSut()
             => new(
                 _tokenSettings,
-                ServiceProvider.GetRequiredService<IRefreshTokenRepository>(),
+                _refreshTokenRepository,
                 _dateTimeProvider);
 
         private TestUser MakeUser()
@@ -39,7 +42,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
                 ipAddress: "test-ip-address",
                 avatarUrl: "test-avatar-url"
             );
-
+        #endregion
         #region testCases
         [Fact]
         public void GetClaims_ShouldReturnCorrectClaims()
@@ -203,7 +206,17 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
         public void IsAccessTokenValid_ShouldReturnTrueForValidToken()
         {
             // Arrange
-            var sut = MakeSut();
+            var mockConstructor = new object [] {
+                _tokenSettings,
+                _refreshTokenRepository,
+                _dateTimeProvider
+            };
+            var sutMock = new Mock<TokenService>(mockConstructor);
+            sutMock.CallBase = true; // partial mock
+            sutMock.Setup(x => x.ValidateJWT("valid-token", new TokenValidationParameters()))
+            .Returns(new ClaimsPrincipal());
+            var sut = sutMock.Object;
+
             var user = MakeUser();
             var token = sut.GenerateAccessToken(user);
 
@@ -215,10 +228,21 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
         }
 
         [Fact]
-        public void IsAccessTokenValid_ShouldReturnFalseForInValidToken()
+        public void IsAccessTokenValid_ShouldReturnFalseForInvalidToken()
         {
             // Arrange
-            var sut = MakeSut();
+            var mockConstructor = new object [] {
+                _tokenSettings,
+                _refreshTokenRepository,
+                _dateTimeProvider
+            };
+            var sutMock = new Mock<TokenService>(mockConstructor);
+            sutMock.CallBase = true; // partial mock
+            sutMock.Setup(x => x.ValidateJWT("valid-token", new TokenValidationParameters()))
+            .Throws(new SecurityTokenExpiredException());
+            var sut = sutMock.Object;
+
+
             var token = "somejwttoken";
 
             // Act
