@@ -206,7 +206,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
         public void IsAccessTokenValid_ShouldReturnTrueForValidToken()
         {
             // Arrange
-            var mockConstructor = new object [] {
+            var mockConstructor = new object[] {
                 _tokenSettings,
                 _refreshTokenRepository,
                 _dateTimeProvider
@@ -231,7 +231,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
         public void IsAccessTokenValid_ShouldReturnFalseForInvalidToken()
         {
             // Arrange
-            var mockConstructor = new object [] {
+            var mockConstructor = new object[] {
                 _tokenSettings,
                 _refreshTokenRepository,
                 _dateTimeProvider
@@ -251,7 +251,63 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             // Assert
             isValidResult.Succeeded.Should().BeFalse();
         }
+        [Fact]
+        public void IsAccessTokenValid_ShouldCallValidateJWT()
+        {
+            // Arrange
+            var mockConstructor = new object[] {
+                _tokenSettings,
+                _refreshTokenRepository,
+                _dateTimeProvider
+            };
+            var sutMock = new Mock<TokenService>(mockConstructor);
+            sutMock.CallBase = true; // partial mock
+            sutMock.Setup(x => x.ValidateJWT("valid-token", new TokenValidationParameters()))
+            .Returns(new ClaimsPrincipal());
+            var sut = sutMock.Object;
 
+
+            var token = "somejwttoken";
+            // Act
+            sut.IsAccessTokenValid(token);
+
+            // Assert
+            sutMock.Verify(x => x.ValidateJWT(token, It.IsAny<TokenValidationParameters>()), Times.Once);
+        }
+
+        [Fact]
+        public void ValidateJWT_ShouldReturnClaimsPrincipalForValidToken()
+        {
+            // Arrange
+            var sut = MakeSut();
+            var token = sut.GenerateAccessToken(MakeUser());
+            var validationParameters = new TokenValidationParameters()
+            {
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenSettings.SecretKey)),
+                ValidateIssuer = false, //
+                ValidateAudience = false, //
+                ValidateLifetime = false, //
+            };
+            // Act & Assert
+            var result = sut.ValidateJWT(token, validationParameters);
+            result.Should().NotBeNull().And.BeOfType<ClaimsPrincipal>();
+        }
+        [Fact]
+        public void ValidateJWT_ShouldThrowForInvalidToken()
+        {
+            // Arrange
+            var sut = MakeSut();
+            var token = "invalid token!";
+            var validationParameters = new TokenValidationParameters()
+            {
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenSettings.SecretKey)),
+                ValidateIssuer = false, //
+                ValidateAudience = false, //
+                ValidateLifetime = false, //
+            };
+            // Act & Assert
+            Assert.ThrowsAny<Exception>(() => sut.ValidateJWT(token, validationParameters));
+        }
         [Fact]
         public void IsRefreshTokenValid_ShouldReturnTrueForValidToken()
         {
