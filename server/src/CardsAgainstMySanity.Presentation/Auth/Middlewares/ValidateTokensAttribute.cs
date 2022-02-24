@@ -20,7 +20,8 @@ namespace CardsAgainstMySanity.Presentation.Auth.Middlewares
             {
                 context.HttpContext.Response.Cookies.Delete("cards_accesstoken");
                 context.HttpContext.Response.Cookies.Delete("cards_refreshtoken");
-                context.HttpContext.Response.Headers.Add("Cards-Tokens", result.Error.ToString());
+                var errorMessage = GetTokenErrorMessage(result.Error);
+                context.HttpContext.Response.Headers.Add("X-Cards-Tokens", errorMessage);
                 context.Result = new UnauthorizedResult();
                 return;
             }
@@ -33,5 +34,13 @@ namespace CardsAgainstMySanity.Presentation.Auth.Middlewares
             });
             context.HttpContext.User = principal;
         }
+
+        private string GetTokenErrorMessage(AccessValidationError error) =>
+            error switch
+            {
+                AccessValidationError.AccessTokenInvalid => "invalid access token",
+                AccessValidationError.RefreshTokenInvalid => "invalid refresh token",
+                _ => "Unknown error"
+            };
     }
 }
