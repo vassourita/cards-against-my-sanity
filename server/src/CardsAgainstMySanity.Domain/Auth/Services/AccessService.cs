@@ -26,7 +26,7 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             _logger = logger;
         }
 
-        public async Task<Result<(ClaimsPrincipal, string), AccessValidationError>> ValidateUserTokens(string accessToken, Guid refreshTokenId)
+        public async Task<Result<(ClaimsPrincipal, string), AccessValidationError>> ValidateUserTokens(string accessToken, Guid refreshTokenId, string ipAddress)
         {
             if (string.IsNullOrEmpty(accessToken))
             {
@@ -56,7 +56,7 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             _logger.LogWarning("AccessService.ValidateUserTokens: Access token is expired and will be refreshed");
             var refreshToken = await _refreshTokenRepository.FindByIdAsync(refreshTokenId);
             var user = await _guestRepository.FindByIdAsync(refreshToken.UserId);
-            var refreshResult = _tokenService.Refresh(refreshToken, user);
+            var refreshResult = _tokenService.Refresh(refreshToken, user, ipAddress);
             if (refreshResult.Succeeded)
             {
                 _logger.LogInformation("AccessService.ValidateUserTokens: Token has been refreshed");

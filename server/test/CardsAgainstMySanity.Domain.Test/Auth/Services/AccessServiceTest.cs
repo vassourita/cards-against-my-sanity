@@ -27,7 +27,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
         {
             var mock = new Mock<TokenService>();
             mock.Setup(x => x.IsAccessTokenValid("valid-token"))
-            .Returns(Result<ClaimsPrincipal, TokenService.ValidationError>.Ok(new ClaimsPrincipal()));
+                .Returns(Result<ClaimsPrincipal, TokenService.ValidationError>.Ok(new ClaimsPrincipal()));
             return mock;
         }
 
@@ -48,8 +48,8 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
 
         #endregion
         #region tests
-        [Fact]
-        public async void ValidateUserTokens_ValidTokens_ShouldSucceed()
+        [Fact(DisplayName = "#ValidateUserTokens should return a valid access token when valid tokens are provided")]
+        public async void ValidateUserTokens_ValidArguments_ShouldSucceed()
         {
             var refreshToken = MakeRefreshToken();
 
@@ -57,7 +57,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             var sut = MakeSut();
 
             // Act
-            var result = await sut.ValidateUserTokens("valid-token", refreshToken.Token);
+            var result = await sut.ValidateUserTokens("valid-token", refreshToken.Token, "127.0.0.1");
 
             // Assert
             result.Succeeded.Should().BeTrue();

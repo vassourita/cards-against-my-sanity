@@ -68,13 +68,14 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             return refreshToken;
         }
 
-        public Result<string> Refresh(RefreshToken refreshToken, IUser user)
+        public Result<string> Refresh(RefreshToken refreshToken, IUser user, string ipAddress)
         {
             if (!IsRefreshTokenValid(refreshToken))
             {
                 return Result<string>.Fail();
             }
             var token = GenerateAccessToken(user);
+            user.SetAccessToken(token, ipAddress);
             return Result<string>.Ok(token);
         }
 
@@ -83,7 +84,9 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             AccessTokenExpired,
             AccessTokenInvalid,
         }
-        public virtual ClaimsPrincipal ValidateJWT (string token, TokenValidationParameters validationParameters){
+
+        public virtual ClaimsPrincipal ValidateJWT(string token, TokenValidationParameters validationParameters)
+        {
             var tokenHandler = new JwtSecurityTokenHandler();
             SecurityToken validatedToken;
             var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
@@ -94,6 +97,7 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
             }
             return principal;
         }
+
         public virtual Result<ClaimsPrincipal, ValidationError> IsAccessTokenValid(string accessToken)
         {
             TokenValidationParameters validationParameters = new() // shouldn't be put here, I guess
@@ -115,6 +119,7 @@ namespace CardsAgainstMySanity.Domain.Auth.Services
                 return Result<ClaimsPrincipal, ValidationError>.Fail(ValidationError.AccessTokenInvalid);
             }
         }
+
         public bool IsRefreshTokenValid(RefreshToken refreshToken)
         {
             if (refreshToken == null || refreshToken.Expired)

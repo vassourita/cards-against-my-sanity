@@ -13,7 +13,6 @@ using CardsAgainstMySanity.Test;
 using Microsoft.Extensions.DependencyInjection;
 using CardsAgainstMySanity.Domain.Auth.Repositories;
 using Moq;
-using CardsAgainstMySanity.SharedKernel;
 
 namespace CardsAgainstMySanity.Domain.Test.Auth.Services
 {
@@ -43,8 +42,9 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
                 avatarUrl: "test-avatar-url"
             );
         #endregion
+
         #region testCases
-        [Fact]
+        [Fact(DisplayName = "#GetClaims should return valid claims")]
         public void GetClaims_ShouldReturnCorrectClaims()
         {
             // Arrange
@@ -65,7 +65,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
                     c.Value == user.Username);
         }
 
-        [Fact]
+        [Fact(DisplayName = "#GeneratePrincipal should return a valid principal")]
         public void GeneratePrincipal_ShouldReturnValidPrincipal()
         {
             // Arrange
@@ -91,7 +91,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             principal.Identity.AuthenticationType.Should().Be("Bearer");
         }
 
-        [Fact]
+        [Fact(DisplayName = "#GenerateToken should return a valid token")]
         public void GenerateAccessToken_ShouldReturnValidToken()
         {
             // Arrange
@@ -146,7 +146,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
         private DateTime RemoveMs(DateTime dt)
             => DateTime.Parse(dt.ToString("yyyy-MM-dd HH:mm:ss"));
 
-        [Fact]
+        [Fact(DisplayName = "#GenerateRefreshToken should return a valid token")]
         public void GenerateRefreshToken_ShouldReturnValidToken()
         {
             // Arrange
@@ -165,8 +165,8 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
                 .Should().Be(Guid.Empty);
         }
 
-        [Fact]
-        public void Refresh_ShouldRefreshValidTokens()
+        [Fact(DisplayName = "#Refresh should return a valid token for a user when a valid refresh token is provided")]
+        public void Refresh_ValidTokens_ShouldRefresh()
         {
             // Arrange
             var sut = MakeSut();
@@ -174,7 +174,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             var token = sut.GenerateRefreshToken(true);
 
             // Act
-            var newTokenResult = sut.Refresh(token, user);
+            var newTokenResult = sut.Refresh(token, user, "127.0.0.1");
 
             // Assert
             newTokenResult.Succeeded.Should().BeTrue();
@@ -182,8 +182,8 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
                 .Should().NotBeNullOrEmpty();
         }
 
-        [Fact]
-        public void Refresh_ShouldNotRefreshInvalidToken()
+        [Fact(DisplayName = "#Refresh should not return a valid token for a user when a invalid refresh token is provided")]
+        public void Refresh_InvalidToken_ShouldNotRefresh()
         {
             // Arrange
             var sut = MakeSut();
@@ -194,7 +194,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
                 _dateTimeProvider);
 
             // Act
-            var newTokenResult = sut.Refresh(token, user);
+            var newTokenResult = sut.Refresh(token, user, "127.0.0.1");
 
             // Assert
             newTokenResult.Failed.Should().BeTrue();
@@ -202,7 +202,27 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
                 .Should().Be(default(string));
         }
 
-        [Fact]
+        [Fact(DisplayName = "#Refresh should not return a valid token for a user when a invalid ip address is provided")]
+        public void Refresh_InvalidIpAddress_ShouldNotRefresh()
+        {
+            // Arrange
+            var sut = MakeSut();
+            var user = MakeUser();
+            var token = new RefreshToken(
+                Guid.NewGuid(),
+                _dateTimeProvider.UtcNow.AddMinutes(-1),
+                _dateTimeProvider);
+
+            // Act
+            var newTokenResult = sut.Refresh(token, user, "some-ip");
+
+            // Assert
+            newTokenResult.Failed.Should().BeTrue();
+            newTokenResult.Data
+                .Should().Be(default(string));
+        }
+
+        [Fact(DisplayName = "#IsAccessTokenValid should return true when a valid token is provided")]
         public void IsAccessTokenValid_ShouldReturnTrueForValidToken()
         {
             // Arrange
@@ -227,7 +247,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             isValidResult.Succeeded.Should().BeTrue();
         }
 
-        [Fact]
+        [Fact(DisplayName = "#IsAccessTokenValid should return false when an invalid token is provided")]
         public void IsAccessTokenValid_ShouldReturnFalseForInvalidToken()
         {
             // Arrange
@@ -251,7 +271,8 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             // Assert
             isValidResult.Succeeded.Should().BeFalse();
         }
-        [Fact]
+
+        [Fact(DisplayName = "#IsAccessTokenValid should make a call to #ValidateJWT")]
         public void IsAccessTokenValid_ShouldCallValidateJWT()
         {
             // Arrange
@@ -275,7 +296,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             sutMock.Verify(x => x.ValidateJWT(token, It.IsAny<TokenValidationParameters>()), Times.Once);
         }
 
-        [Fact]
+        [Fact(DisplayName = "#ValidateJWT should return a ClaimsPrincipal when a valid token is provided")]
         public void ValidateJWT_ShouldReturnClaimsPrincipalForValidToken()
         {
             // Arrange
@@ -292,8 +313,8 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             var result = sut.ValidateJWT(token, validationParameters);
             result.Should().NotBeNull().And.BeOfType<ClaimsPrincipal>();
         }
-        [Fact]
-        public void ValidateJWT_ShouldThrowForInvalidToken()
+        [Fact(DisplayName = "#ValidateJWT should throw an ArgumentException when an token with an invalid segmentation is provided")]
+        public void ValidateJWT_InvalidTokenSegmentation_ShouldThrowArgumentException()
         {
             // Arrange
             var sut = MakeSut();
@@ -305,10 +326,12 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
                 ValidateAudience = false, //
                 ValidateLifetime = false, //
             };
+
             // Act & Assert
-            Assert.ThrowsAny<Exception>(() => sut.ValidateJWT(token, validationParameters));
+            Assert.ThrowsAny<ArgumentException>(() => sut.ValidateJWT(token, validationParameters));
         }
-        [Fact]
+
+        [Fact(DisplayName = "#IsRefreshTokenValid should return true when a valid token is provided")]
         public void IsRefreshTokenValid_ShouldReturnTrueForValidToken()
         {
             // Arrange
@@ -322,7 +345,7 @@ namespace CardsAgainstMySanity.Domain.Test.Auth.Services
             isValid.Should().BeTrue();
         }
 
-        [Fact]
+        [Fact(DisplayName = "#IsRefreshTokenValid should return false when an invalid token is provided")]
         public void IsRefreshTokenValid_ShouldReturnFalseForInvalidToken()
         {
             // Arrange

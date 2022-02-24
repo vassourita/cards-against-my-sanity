@@ -14,7 +14,7 @@ namespace CardsAgainstMySanity.Presentation.Auth.Middlewares
 
             var accessService = context.HttpContext.RequestServices.GetRequiredService<AccessService>();
 
-            var result = await accessService.ValidateUserTokens(accessToken, Guid.Parse(refreshToken));
+            var result = await accessService.ValidateUserTokens(accessToken, Guid.Parse(refreshToken), context.HttpContext.Connection.RemoteIpAddress.ToString());
 
             if (result.Failed)
             {
