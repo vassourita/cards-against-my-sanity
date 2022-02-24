@@ -1,8 +1,7 @@
-namespace CardsAgainstMySanity.Domain.Providers
+namespace CardsAgainstMySanity.Domain.Providers;
+
+public interface IDateTimeProvider
 {
-    public interface IDateTimeProvider
-    {
-        DateTime Now { get; }
-        DateTime UtcNow { get; }
-    }
+    DateTime Now { get; }
+    DateTime UtcNow { get; }
 }

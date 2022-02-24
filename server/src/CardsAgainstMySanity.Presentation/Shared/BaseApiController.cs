@@ -1,28 +1,21 @@
+namespace CardsAgainstMySanity.Presentation.Shared;
+
 using Microsoft.AspNetCore.Mvc;
 
-namespace CardsAgainstMySanity.Presentation.Shared
+public class BaseApiController : ControllerBase
 {
-    public class BaseApiController : ControllerBase
+    protected StatusCodeResult InternalServerError() => this.StatusCode(500);
+
+    protected bool IsInvalidModelState(out BadRequestObjectResult response)
     {
-        protected StatusCodeResult InternalServerError()
+        if (!this.ModelState.IsValid)
         {
-            return StatusCode(500);
+            response = this.BadRequest(this.ModelState.SelectMany(x => x.Value.Errors).Select(x => x.ErrorMessage));
+            return true;
         }
-
-        protected bool IsInvalidModelState(out BadRequestObjectResult response)
-        {
-            if (!ModelState.IsValid)
-            {
-                response = BadRequest(ModelState.SelectMany(x => x.Value.Errors).Select(x => x.ErrorMessage));
-                return true;
-            }
-            response = null;
-            return false;
-        }
-
-        protected string GetIpAddress()
-        {
-            return Request.HttpContext.Connection.RemoteIpAddress.ToString();
-        }
+        response = null;
+        return false;
     }
+
+    protected string GetIpAddress() => this.Request.HttpContext.Connection.RemoteIpAddress.ToString();
 }

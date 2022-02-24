@@ -1,9 +1,8 @@
-namespace CardsAgainstMySanity.Domain.Card
+namespace CardsAgainstMySanity.Domain.Card;
+
+public interface ICard
 {
-    public interface ICard
-    {
-        int Id { get; }
-        string Text { get; }
-        int DeckId { get; }
-    }
+    int Id { get; }
+    string Text { get; }
+    int DeckId { get; }
 }

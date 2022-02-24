@@ -1,25 +1,24 @@
+namespace CardsAgainstMySanity.Domain.Auth.Tokens;
+
 using CardsAgainstMySanity.Domain.Providers;
 
-namespace CardsAgainstMySanity.Domain.Auth.Tokens
+public class RefreshToken
 {
-    public class RefreshToken
+    public Guid Token { get; protected set; }
+    public DateTime ExpiresAt { get; protected set; }
+    public bool Expired => this.ExpiresAt < DateTime.UtcNow;
+    public DateTime CreatedAt { get; protected set; }
+
+    public Guid UserId { get; protected set; }
+
+    // For EF
+    protected RefreshToken()
+    { }
+
+    public RefreshToken(Guid token, DateTime expiresAt, IDateTimeProvider dateTimeProvider)
     {
-        public Guid Token { get; protected set; }
-        public DateTime ExpiresAt { get; protected set; }
-        public bool Expired { get => ExpiresAt < DateTime.UtcNow; }
-        public DateTime CreatedAt { get; protected set; }
-
-        public Guid UserId { get; protected set; }
-
-        // For EF
-        protected RefreshToken()
-        { }
-
-        public RefreshToken(Guid token, DateTime expiresAt, IDateTimeProvider dateTimeProvider)
-        {
-            Token = token;
-            ExpiresAt = expiresAt;
-            CreatedAt = dateTimeProvider.UtcNow;
-        }
+        this.Token = token;
+        this.ExpiresAt = expiresAt;
+        this.CreatedAt = dateTimeProvider.UtcNow;
     }
 }

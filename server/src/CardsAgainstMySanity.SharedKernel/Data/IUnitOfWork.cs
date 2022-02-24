@@ -1,8 +1,7 @@
-namespace CardsAgainstMySanity.SharedKernel.Data
+namespace CardsAgainstMySanity.SharedKernel.Data;
+
+public interface IUnitOfWork
 {
-    public interface IUnitOfWork
-    {
-        Task CommitAsync();
-        Task RollbackAsync();
-    }
+    Task CommitAsync();
+    Task RollbackAsync();
 }

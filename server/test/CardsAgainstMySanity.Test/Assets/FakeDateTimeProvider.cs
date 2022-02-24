@@ -1,17 +1,16 @@
+namespace CardsAgainstMySanity.Test.Assets;
+
 using System;
 using CardsAgainstMySanity.Domain.Providers;
 
-namespace CardsAgainstMySanity.Test.Assets
+public class FakeDateTimeProvider : IDateTimeProvider
 {
-    public class FakeDateTimeProvider : IDateTimeProvider
+    public FakeDateTimeProvider(DateTime now, DateTime utcNow)
     {
-        public FakeDateTimeProvider(DateTime now, DateTime utcNow)
-        {
-            Now = now;
-            UtcNow = utcNow;
-        }
-
-        public DateTime Now { get; private set; }
-        public DateTime UtcNow { get; private set; }
+        this.Now = now;
+        this.UtcNow = utcNow;
     }
+
+    public DateTime Now { get; private set; }
+    public DateTime UtcNow { get; private set; }
 }

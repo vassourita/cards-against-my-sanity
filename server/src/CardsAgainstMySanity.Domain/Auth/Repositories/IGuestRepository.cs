@@ -1,8 +1,7 @@
+namespace CardsAgainstMySanity.Domain.Auth.Repositories;
+
 using CardsAgainstMySanity.SharedKernel.Data;
 
-namespace CardsAgainstMySanity.Domain.Auth.Repositories
+public interface IGuestRepository : IRepository<Guest, Guid>
 {
-    public interface IGuestRepository : IRepository<Guest, Guid>
-    {
-    }
 }

@@ -1,68 +1,67 @@
-using Moq;
-using Xunit;
-using FluentAssertions;
+namespace CardsAgainstMySanity.Domain.Test.Auth.Services;
+
+using System.Security.Claims;
+using CardsAgainstMySanity.Domain.Auth.Repositories;
 using CardsAgainstMySanity.Domain.Auth.Services;
 using CardsAgainstMySanity.Domain.Auth.Tokens;
 using CardsAgainstMySanity.Domain.Providers;
+using CardsAgainstMySanity.SharedKernel;
 using CardsAgainstMySanity.Test;
-using CardsAgainstMySanity.Domain.Auth.Repositories;
+using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using CardsAgainstMySanity.SharedKernel;
-using System.Security.Claims;
+using Moq;
+using Xunit;
 
-namespace CardsAgainstMySanity.Domain.Test.Auth.Services
+public class AccessServiceTest : TestBase
 {
-    public class AccessServiceTest : TestBase
+    private readonly ILogger<AccessService> _logger;
+    public AccessServiceTest()
     {
-        private readonly ILogger<AccessService> _logger;
-        public AccessServiceTest()
-        {
-            var _loggerFactory = new LoggerFactory();
-            _logger = LoggerFactoryExtensions.CreateLogger<AccessService>(_loggerFactory);
-        }
+        var _loggerFactory = new LoggerFactory();
+        this._logger = LoggerFactoryExtensions.CreateLogger<AccessService>(_loggerFactory);
+    }
 
-        #region factories
-        private Mock<TokenService> MakeMockTokenService()
-        {
-            var mock = new Mock<TokenService>();
-            mock.Setup(x => x.IsAccessTokenValid("valid-token"))
-                .Returns(Result<ClaimsPrincipal, TokenService.ValidationError>.Ok(new ClaimsPrincipal()));
-            return mock;
-        }
+    #region factories
+    private static Mock<TokenService> MakeMockTokenService()
+    {
+        var mock = new Mock<TokenService>();
+        mock.Setup(x => x.IsAccessTokenValid("valid-token"))
+            .Returns(Result<ClaimsPrincipal, TokenService.ValidationError>.Ok(new ClaimsPrincipal()));
+        return mock;
+    }
 
-        private AccessService MakeSut() => new AccessService(
-            ServiceProvider.GetRequiredService<IRefreshTokenRepository>(),
-            MakeMockTokenService().Object,
-            ServiceProvider.GetRequiredService<IGuestRepository>(),
-            _logger
-            );
-
-        private IDateTimeProvider MakeDateTimeProvider() => ServiceProvider.GetRequiredService<IDateTimeProvider>();
-
-        private RefreshToken MakeRefreshToken() => new RefreshToken(
-            System.Guid.NewGuid(),
-            MakeDateTimeProvider().UtcNow.AddMinutes(2),
-            MakeDateTimeProvider()
+    private AccessService MakeSut() => new(
+        this.ServiceProvider.GetRequiredService<IRefreshTokenRepository>(),
+        MakeMockTokenService().Object,
+        this.ServiceProvider.GetRequiredService<IGuestRepository>(),
+        this._logger
         );
 
-        #endregion
-        #region tests
-        [Fact(DisplayName = "#ValidateUserTokens should return a valid access token when valid tokens are provided")]
-        public async void ValidateUserTokens_ValidArguments_ShouldSucceed()
-        {
-            var refreshToken = MakeRefreshToken();
+    private IDateTimeProvider MakeDateTimeProvider() => this.ServiceProvider.GetRequiredService<IDateTimeProvider>();
 
-            // Arrange
-            var sut = MakeSut();
+    private RefreshToken MakeRefreshToken() => new(
+        System.Guid.NewGuid(),
+        this.MakeDateTimeProvider().UtcNow.AddMinutes(2),
+        this.MakeDateTimeProvider()
+    );
 
-            // Act
-            var result = await sut.ValidateUserTokens("valid-token", refreshToken.Token, "127.0.0.1");
+    #endregion
+    #region tests
+    [Fact(DisplayName = "#ValidateUserTokens should return a valid access token when valid tokens are provided")]
+    public async void ValidateUserTokensValidArgumentsShouldSucceed()
+    {
+        var refreshToken = this.MakeRefreshToken();
 
-            // Assert
-            result.Succeeded.Should().BeTrue();
-            result.Data.Should().NotBeNull();
-        }
-        #endregion
+        // Arrange
+        var sut = this.MakeSut();
+
+        // Act
+        var result = await sut.ValidateUserTokens("valid-token", refreshToken.Token, "127.0.0.1");
+
+        // Assert
+        result.Succeeded.Should().BeTrue();
+        result.Data.Should().NotBeNull();
     }
+    #endregion
 }

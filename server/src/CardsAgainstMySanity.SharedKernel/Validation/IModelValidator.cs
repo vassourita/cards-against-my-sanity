@@ -1,7 +1,6 @@
-namespace CardsAgainstMySanity.SharedKernel.Validation
+namespace CardsAgainstMySanity.SharedKernel.Validation;
+
+public interface IModelValidator<T>
 {
-    public interface IModelValidator<T>
-    {
-        Result<T, ValidationErrorList> Validate(T model);
-    }
+    Result<T, ValidationErrorList> Validate(T model);
 }
