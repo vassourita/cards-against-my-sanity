@@ -33,7 +33,7 @@ module.exports = {
 			2,
 			'always',
 			[
-				'server',
+				'api',
 				'web-client',
 			],
 		],
