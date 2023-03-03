@@ -1,10 +1,12 @@
 namespace CardsAgainstMySanity.SharedKernel.Validation;
 
+using System.Globalization;
+
 public class ValidationErrorList : Dictionary<string, List<string>>
 {
     public ValidationErrorList AddError(string propertyName, string errorMessage)
     {
-        var prop = propertyName.ToLower();
+        var prop = propertyName.ToLower(CultureInfo.InvariantCulture);
         try
         {
             this[prop].Add(errorMessage);

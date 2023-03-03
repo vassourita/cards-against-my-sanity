@@ -1,13 +1,6 @@
 namespace CardsAgainstMySanity.Infrastructure.IoC;
 
-using CardsAgainstMySanity.Domain.Auth.Repositories;
-using CardsAgainstMySanity.Domain.Auth.Services;
-using CardsAgainstMySanity.Domain.Auth.Tokens;
-using CardsAgainstMySanity.Domain.Providers;
 using CardsAgainstMySanity.Infrastructure.Data.EntityFramework;
-using CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Mappings;
-using CardsAgainstMySanity.Infrastructure.Data.EntityFramework.Repositories;
-using CardsAgainstMySanity.Infrastructure.Providers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,31 +18,18 @@ public static class ServiceCollectionExtensions
         });
 
         // Providers
-        services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
 
         // Automapper
-        services.AddAutoMapper(config => config.AddProfile<UserMappingProfile>());
 
         // Configuration
-        services.AddSingleton((_) =>
-        {
-            var tokenSettings = new TokenSettings();
-            configuration.Bind("TokenSettings", tokenSettings);
-            return tokenSettings;
-        });
 
         // EF
         services.AddDbContext<DataContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
         // Repositories
-        services.AddScoped<IGuestRepository, EFGuestRepository>();
-        services.AddScoped<IRefreshTokenRepository, EFRefreshTokenRepository>();
 
         // Services
-        services.AddScoped<GuestService>();
-        services.AddScoped<TokenService>();
-        services.AddScoped<AccessService>();
 
         return services;
     }
