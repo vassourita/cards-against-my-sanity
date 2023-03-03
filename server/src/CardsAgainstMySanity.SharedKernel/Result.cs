@@ -1,43 +1,62 @@
 namespace CardsAgainstMySanity.SharedKernel;
 
+using System;
+
 public interface IResult
 {
     bool Succeeded { get; }
+
     bool Failed { get; }
 }
 
-public class Result : IResult
+public abstract class Result : IResult
 {
-    public bool Succeeded { get; }
-    public bool Failed => !this.Succeeded;
+    protected Result(bool succeeded)
+        => Succeeded = succeeded;
 
-    protected Result(bool succeeded) => this.Succeeded = succeeded;
+    public bool Succeeded { get; private set; }
 
-    public static Result Ok() => new(true);
-
-    public static Result Fail() => new(false);
+    public bool Failed => !Succeeded;
 }
 
-public class Result<TData> : Result
+public abstract class Result<TData> : Result, IResult
 {
-    public TData Data { get; }
+    protected Result(TData data) : base(true)
+        => Data = data;
 
-    protected Result(bool succeeded, TData data) : base(succeeded) => this.Data = data;
+    protected Result() : base(false)
+    {
+    }
 
-    public static Result<TData> Ok(TData data) => new(true, data);
+    private TData _data;
 
-    public static new Result<TData> Fail() => new(false, default);
+    public TData Data
+    {
+        get => Succeeded ? _data : throw new InvalidOperationException($"You can't access .{nameof(Data)} when .{nameof(Succeeded)} is false");
+        private set => _data = value;
+    }
 }
 
-public class Result<TData, TError> : Result<TData>
+public abstract class Result<TData, TError> : Result, IResult
 {
-    public TError Error { get; }
+    protected Result(TData data) : base(true)
+        => Data = data;
 
-    protected Result(bool succeeded, TData data, TError error) : base(succeeded, data) => this.Error = error;
+    protected Result(TError error) : base(false)
+        => Error = error;
 
-    public static new Result<TData, TError> Ok(TData data) => new(true, data, default);
+    private TData _data;
+    private TError _error;
 
-    public static new Result<TData, TError> Fail() => new(false, default, default);
+    public TData Data
+    {
+        get => Succeeded ? _data : throw new InvalidOperationException($"You can't access .{nameof(Data)} when .{nameof(Succeeded)} is false");
+        private set => _data = value;
+    }
 
-    public static Result<TData, TError> Fail(TError error) => new(false, default, error);
+    public TError Error
+    {
+        get => Failed ? _error : throw new InvalidOperationException($"You can't access .{nameof(Error)} when .{nameof(Failed)} is false");
+        private set => _error = value;
+    }
 }

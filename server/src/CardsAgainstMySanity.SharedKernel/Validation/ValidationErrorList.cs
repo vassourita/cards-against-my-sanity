@@ -23,4 +23,5 @@ public class ValidationErrorList : Dictionary<string, List<string>>
     }
 
     public ValidationErrorList() { }
+    public ValidationErrorList(string propertyName, string errorMessage) => AddError(propertyName, errorMessage);
 }
