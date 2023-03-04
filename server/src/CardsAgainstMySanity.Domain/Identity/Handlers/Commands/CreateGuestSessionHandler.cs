@@ -26,7 +26,7 @@ public class CreateGuestSessionHandler : IRequestHandler<CreateGuestSessionReque
 
     public async Task<CreateGuestSessionResult> Handle(CreateGuestSessionRequest request, CancellationToken cancellationToken)
     {
-        var guestExists = await _guestRepository.FindByNameAsync(request.Name);
+        var guestExists = await _guestRepository.FindActiveByNameAsync(request.Name);
         if (guestExists is not null)
             return CreateGuestSessionResult.Fail(new ValidationErrorList("Name", "Name is already taken"));
 

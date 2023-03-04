@@ -9,6 +9,7 @@ using MediatR;
 
 public class RefreshTokenHandler : IRequestHandler<RefreshTokenRequest, RefreshTokenResult>
 {
+    private readonly IGuestRepository _guestRepository;
     private readonly AccessTokenFactory _accessTokenFactory;
     private readonly RefreshTokenFactory _refreshTokenFactory;
     private readonly TokenValidator _tokenValidator;
@@ -16,11 +17,13 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenRequest, RefreshT
     public RefreshTokenHandler(
         AccessTokenFactory accessTokenFactory,
         RefreshTokenFactory refreshTokenFactory,
-        TokenValidator tokenValidator)
+        TokenValidator tokenValidator,
+        IGuestRepository guestRepository)
     {
         _accessTokenFactory = accessTokenFactory;
         _refreshTokenFactory = refreshTokenFactory;
         _tokenValidator = tokenValidator;
+        _guestRepository = guestRepository;
     }
 
     public async Task<RefreshTokenResult> Handle(RefreshTokenRequest request, CancellationToken cancellationToken)
@@ -28,14 +31,37 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenRequest, RefreshT
         if (string.IsNullOrWhiteSpace(request.RefreshToken))
             return RefreshTokenResult.Fail();
 
-        var user = await _tokenValidator.ValidateAsync(request.RefreshToken, true);
+        Guest guest;
+        if (_tokenValidator.TryValidate(request.RefreshToken, true, out var principalId))
+        {
+            guest = await _guestRepository.FindByIdAsync(principalId);
 
-        if (user == null)
+            if (!guest.IsActive)
+                return RefreshTokenResult.Fail();
+
+            var accessToken = await _accessTokenFactory.GenerateAsync(guest);
+            var refreshToken = await _refreshTokenFactory.GenerateAsync(guest);
+
+            guest.UpdateLastActivityDate();
+            await _guestRepository.UpdateAsync(guest);
+            await _guestRepository.CommitAsync();
+
+            return RefreshTokenResult.Ok(accessToken, refreshToken);
+        }
+
+        if (principalId == null)
             return RefreshTokenResult.Fail();
 
-        var accessToken = await _accessTokenFactory.GenerateAsync(user);
-        var refreshToken = await _refreshTokenFactory.GenerateAsync(user);
+        guest = await _guestRepository.FindByIdAsync(principalId);
+        if (!guest.IsActive)
+            return RefreshTokenResult.Fail();
 
-        return RefreshTokenResult.Ok(accessToken, refreshToken);
+        if (guest.LastActivityDate.AddHours(1) <= DateTime.UtcNow)
+            return RefreshTokenResult.Fail();
+
+        guest.Deactivate();
+        await _guestRepository.UpdateAsync(guest);
+        await _guestRepository.CommitAsync();
+        return RefreshTokenResult.Fail();
     }
 }

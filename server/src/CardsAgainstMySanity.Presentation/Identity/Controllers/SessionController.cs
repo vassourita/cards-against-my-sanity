@@ -43,14 +43,18 @@ public class SessionController : ControllerBase
     [Route("refresh")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationErrorResponse))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Refresh()
     {
         var request = new RefreshTokenRequest(Request.Cookies["cams_refreshtoken"]);
         var result = await _mediator.Send(request);
 
         if (result.Failed)
+        {
+            Response.Cookies.Delete("cams_accesstoken");
+            Response.Cookies.Delete("cams_refreshtoken");
             return BadRequest();
+        }
 
         var (accessToken, refreshToken) = result.Data;
 
