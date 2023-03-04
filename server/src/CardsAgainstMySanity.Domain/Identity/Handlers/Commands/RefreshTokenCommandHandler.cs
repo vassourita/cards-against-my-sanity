@@ -25,6 +25,9 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenRequest, RefreshT
 
     public async Task<RefreshTokenResult> Handle(RefreshTokenRequest request, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.RefreshToken))
+            return RefreshTokenResult.Fail();
+
         var user = await _tokenValidator.ValidateAsync(request.RefreshToken, true);
 
         if (user == null)

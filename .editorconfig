@@ -301,13 +301,22 @@ dotnet_naming_rule.public_protected_constant_fields_must_be_pascal_case_rule.sym
 dotnet_naming_rule.public_protected_constant_fields_must_be_pascal_case_rule.style      = pascal_case_style
 dotnet_naming_rule.public_protected_constant_fields_must_be_pascal_case_rule.severity   = warning
 
-# All public/protected/protected_internal static readonly fields must be PascalCase
+# All public static readonly fields must be PascalCase
 # https://docs.microsoft.com/dotnet/standard/design-guidelines/field
-dotnet_naming_symbols.public_protected_static_readonly_fields_group.applicable_accessibilities = public, protected, protected_internal
-dotnet_naming_symbols.public_protected_static_readonly_fields_group.required_modifiers         = static, readonly
-dotnet_naming_symbols.public_protected_static_readonly_fields_group.applicable_kinds           = field
-dotnet_naming_rule.public_protected_static_readonly_fields_must_be_pascal_case_rule.symbols    = public_protected_static_readonly_fields_group
+dotnet_naming_symbols.public_static_readonly_fields_group.applicable_accessibilities           = public, protected, protected_internal
+dotnet_naming_symbols.public_static_readonly_fields_group.required_modifiers                   = static, readonly
+dotnet_naming_symbols.public_static_readonly_fields_group.applicable_kinds                     = field
+dotnet_naming_rule.public_protected_static_readonly_fields_must_be_pascal_case_rule.symbols    = public_static_readonly_fields_group
 dotnet_naming_rule.public_protected_static_readonly_fields_must_be_pascal_case_rule.style      = pascal_case_style
+dotnet_naming_rule.public_protected_static_readonly_fields_must_be_pascal_case_rule.severity   = warning
+
+# All protected/protected_internal static readonly fields must be camelCase with leading underscore
+# https://docs.microsoft.com/dotnet/standard/design-guidelines/field
+dotnet_naming_symbols.protected_static_readonly_fields_group.applicable_accessibilities        = public, protected, protected_internal
+dotnet_naming_symbols.protected_static_readonly_fields_group.required_modifiers                = static, readonly
+dotnet_naming_symbols.protected_static_readonly_fields_group.applicable_kinds                  = field
+dotnet_naming_rule.public_protected_static_readonly_fields_must_be_pascal_case_rule.symbols    = protected_static_readonly_fields_group
+dotnet_naming_rule.public_protected_static_readonly_fields_must_be_pascal_case_rule.style      = camel_case_underscore_style
 dotnet_naming_rule.public_protected_static_readonly_fields_must_be_pascal_case_rule.severity   = warning
 
 # No other public/protected/protected_internal fields are allowed
@@ -334,18 +343,18 @@ dotnet_naming_rule.stylecop_constant_fields_must_be_pascal_case_rule.symbols    
 dotnet_naming_rule.stylecop_constant_fields_must_be_pascal_case_rule.style      = pascal_case_style
 dotnet_naming_rule.stylecop_constant_fields_must_be_pascal_case_rule.severity   = warning
 
-# All static readonly fields must be PascalCase except for private fields
+# All static readonly fields must be PascalCase except for private and protected fields
 # https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1311.md
-dotnet_naming_symbols.stylecop_static_readonly_fields_group.applicable_accessibilities = public, internal, protected_internal, protected
+dotnet_naming_symbols.stylecop_static_readonly_fields_group.applicable_accessibilities = public, internal
 dotnet_naming_symbols.stylecop_static_readonly_fields_group.required_modifiers         = static, readonly
 dotnet_naming_symbols.stylecop_static_readonly_fields_group.applicable_kinds           = field
 dotnet_naming_rule.stylecop_static_readonly_fields_must_be_pascal_case_rule.symbols    = stylecop_static_readonly_fields_group
 dotnet_naming_rule.stylecop_static_readonly_fields_must_be_pascal_case_rule.style      = pascal_case_style
 dotnet_naming_rule.stylecop_static_readonly_fields_must_be_pascal_case_rule.severity   = warning
 
-# Private static readonly fields must be camelCase with a leading underscore
+# Private and protected static readonly fields must be camelCase with a leading underscore
 # https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1311.md
-dotnet_naming_symbols.stylecop_private_static_readonly_fields_group.applicable_accessibilities = private_protected, private
+dotnet_naming_symbols.stylecop_private_static_readonly_fields_group.applicable_accessibilities = private_protected, private, protected_internal, protected
 dotnet_naming_symbols.stylecop_private_static_readonly_fields_group.required_modifiers         = static, readonly
 dotnet_naming_symbols.stylecop_private_static_readonly_fields_group.applicable_kinds           = field
 dotnet_naming_rule.stylecop_private_static_readonly_fields_must_be_camel_case_rule.symbols     = stylecop_private_static_readonly_fields_group
