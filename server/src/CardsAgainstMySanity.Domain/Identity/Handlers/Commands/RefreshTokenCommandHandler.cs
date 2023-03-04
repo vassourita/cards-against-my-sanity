@@ -39,6 +39,9 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenRequest, RefreshT
             if (!guest.IsActive)
                 return RefreshTokenResult.Fail();
 
+            if (await TryDeactivateGuestByInactivity(guest))
+                return RefreshTokenResult.Fail();
+
             var accessToken = await _accessTokenFactory.GenerateAsync(guest);
             var refreshToken = await _refreshTokenFactory.GenerateAsync(guest);
 
@@ -56,12 +59,19 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenRequest, RefreshT
         if (!guest.IsActive)
             return RefreshTokenResult.Fail();
 
-        if (guest.LastActivityDate.AddHours(1) <= DateTime.UtcNow)
-            return RefreshTokenResult.Fail();
-
-        guest.Deactivate();
-        await _guestRepository.UpdateAsync(guest);
-        await _guestRepository.CommitAsync();
+        await TryDeactivateGuestByInactivity(guest);
         return RefreshTokenResult.Fail();
+    }
+
+    private async Task<bool> TryDeactivateGuestByInactivity(Guest guest)
+    {
+        if (guest.LastActivityDate.AddHours(1) > DateTime.UtcNow)
+        {
+            guest.Deactivate();
+            await _guestRepository.UpdateAsync(guest);
+            await _guestRepository.CommitAsync();
+            return true;
+        }
+        return false;
     }
 }
