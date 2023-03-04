@@ -31,7 +31,7 @@ public class RefreshTokenFactory
         };
 
         var token = tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
-        return new Token(tokenHandler.WriteToken(token), ((DateTimeOffset)expiresIn).ToUnixTimeSeconds(), "Bearer");
+        return new Token(tokenHandler.WriteToken(token), (DateTimeOffset)expiresIn, "Bearer");
     }
 
     public Task<Token> GenerateAsync(ITokenPrincipal principal) => Task.Run(() => GenerateRefreshTokenCore(principal));
